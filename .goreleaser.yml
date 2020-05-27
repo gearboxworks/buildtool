@@ -49,7 +49,7 @@ archives:
     #   - `{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}`
     # - if format is `binary`:
     #   - `{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}`
-    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    name_template: "{{ .ProjectName }}-{{ .Os }}_{{ .Arch }}"
 
     # Replacements for GOOS and GOARCH in the archive name.
     # Keys should be valid GOOSs or GOARCHs.
