@@ -185,12 +185,18 @@ func (g *TypeGit) IsTagExisting(version string) bool {
 			break
 		}
 
-		if len(state.OutputArray) == 0 {
-			ok = false
-			break
+		if !strings.HasPrefix(version, "v") {
+			version = "v" + version
 		}
 
-		ok = true
+		for _, t := range state.OutputArray {
+			if t == version {
+				ok = true
+				break
+			}
+		}
+
+		ok = false
 	}
 
 	return ok
