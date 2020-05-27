@@ -161,12 +161,6 @@ func (g *TypeGit) DelTag(version string) *ux.State {
 			break
 		}
 
-		ux.PrintflnBlue("Pushing to origin...")
-		state = g.Exec("push", "origin", version)
-		if state.IsNotOk() {
-			break
-		}
-
 		state.SetOk()
 	}
 
