@@ -44,7 +44,13 @@ func Release(cmd *cobra.Command, args []string) {
 		}
 
 
-		Cmd.State = GitTag(version, "Release %s", version)
+		Cmd.State = GitDelTag(version)
+		if Cmd.State.IsNotOk() {
+			break
+		}
+
+
+		Cmd.State = GitAddTag(version, "Release %s", version)
 		if Cmd.State.IsNotOk() {
 			break
 		}

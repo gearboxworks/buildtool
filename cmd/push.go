@@ -48,7 +48,7 @@ func GitChanges() []string {
 			break
 		}
 
-		ux.PrintflnBlue("Adding files to repo...")
+		ux.PrintflnBlue("Checking files in repo...")
 		state = git.Exec("status", "--porcelain")
 		if state.IsNotOk() {
 			break
@@ -109,7 +109,7 @@ func GitPush(comment string, args ...interface{}) *ux.State {
 }
 
 
-func GitTag(version string, comment string, args ...interface{}) *ux.State {
+func GitAddTag(version string, comment string, args ...interface{}) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
@@ -147,4 +147,75 @@ func GitTag(version string, comment string, args ...interface{}) *ux.State {
 	}
 
 	return state
+}
+
+
+func GitDelTag(version string) *ux.State {
+	state := ux.NewState(Cmd.Debug)
+
+	for range OnlyOnce {
+		if version == "" {
+			state.SetError("Missing tag version.")
+			break
+		}
+		if !strings.HasPrefix(version, "v") {
+			version = "v" + version
+		}
+
+		git := NewGit(nil, Cmd.Debug, ".")
+		state = git.Open()
+		if state.IsNotOk() {
+			break
+		}
+
+		if !IsTagExisting(version) {
+			state.SetOk()
+			break
+		}
+
+		ux.PrintflnBlue("Removing version tag in repo...")
+		state = git.Exec("tag", "-d", version)
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnBlue("Pushing to origin...")
+		state = git.Exec("push", "origin", version)
+		if state.IsNotOk() {
+			break
+		}
+
+		state.SetOk()
+	}
+
+	return state
+}
+
+
+func IsTagExisting(version string) bool {
+	state := ux.NewState(Cmd.Debug)
+	var ok bool
+
+	for range OnlyOnce {
+		git := NewGit(nil, Cmd.Debug, ".")
+		state = git.Open()
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnBlue("Checking tag %s in repo...", version)
+		state = git.Exec("tag", "-l", version)
+		if state.IsNotOk() {
+			break
+		}
+
+		if len(state.OutputArray) == 0 {
+			ok = false
+			break
+		}
+
+		ok = true
+	}
+
+	return ok
 }
