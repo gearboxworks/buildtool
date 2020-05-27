@@ -66,11 +66,11 @@ func GitChanges() []string {
 }
 
 
-func GitPush(comment string, args ...string) *ux.State {
+func GitPush(comment string, args ...interface{}) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
-		c := fmt.Sprintf(comment, args)
+		c := fmt.Sprintf(comment, args...)
 		if c == "" {
 			state.SetError("Missing comment to git commit.")
 			break
@@ -109,7 +109,7 @@ func GitPush(comment string, args ...string) *ux.State {
 }
 
 
-func GitTag(version string, comment string, args ...string) *ux.State {
+func GitTag(version string, comment string, args ...interface{}) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
@@ -121,7 +121,7 @@ func GitTag(version string, comment string, args ...string) *ux.State {
 			version = "v" + version
 		}
 
-		c := fmt.Sprintf(comment, args)
+		c := fmt.Sprintf(comment, args...)
 		if c == "" {
 			c = fmt.Sprintf("Commit before release %s", version)
 		}
