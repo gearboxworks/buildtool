@@ -134,7 +134,7 @@ func (g *TypeGit) AddTag(version string, comment string, args ...interface{}) *u
 		}
 
 		ux.PrintflnBlue("Pushing to origin...")
-		state = g.Exec("push", "origin", version)
+		state = g.Exec("push", "--delete", "origin", version)
 		if state.IsNotOk() {
 			break
 		}
