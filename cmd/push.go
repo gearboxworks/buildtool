@@ -116,6 +116,12 @@ func (g *TypeGit) AddTag(version string, comment string, args ...interface{}) *u
 			version = "v" + version
 		}
 
+		if g.IsTagExisting(version) {
+			state.SetOk()
+			break
+		}
+
+
 		c := fmt.Sprintf(comment, args...)
 		if c == "" {
 			c = fmt.Sprintf("Commit before release %s", version)
