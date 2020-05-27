@@ -1,4 +1,4 @@
-package cmd
+package helpers
 
 import (
 	"github.com/newclarity/buildtool/ux"

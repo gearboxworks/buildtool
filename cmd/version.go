@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/blang/semver"
+	"github.com/newclarity/buildtool/cmd/helpers"
 	"github.com/newclarity/buildtool/defaults"
 	"github.com/newclarity/buildtool/ux"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
@@ -17,7 +18,7 @@ func init() {
 
 
 var versionCmd = &cobra.Command{
-	Use:   CmdVersion,
+	Use:   helpers.CmdVersion,
 	Short: ux.SprintfBlue("Show version of %s.", defaults.BinaryName),
 	Long:  ux.SprintfBlue("Show version of %s.", defaults.BinaryName),
 	Run:   Version,
@@ -90,6 +91,8 @@ func VersionUpdate(cmd *cobra.Command, args []string) {
 		}
 	}
 }
+
+
 func selfUpdate(slug string) error {
 	selfupdate.EnableLog()
 

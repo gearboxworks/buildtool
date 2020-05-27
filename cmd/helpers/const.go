@@ -1,4 +1,4 @@
-package cmd
+package helpers
 
 const (
 	SelectDefaultJson = "select:json"
@@ -6,7 +6,7 @@ const (
 	DefaultJsonString 		= "{}"
 
 	DefaultJsonFile 		= "buildtool.json"
-	DefaultJsonFileSuffix 		= ".json"
+	DefaultJsonFileSuffix 	= ".json"
 
 	CmdBuild 			= "build"
 	CmdPush 			= "push"

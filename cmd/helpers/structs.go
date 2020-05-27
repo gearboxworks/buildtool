@@ -1,4 +1,4 @@
-package cmd
+package helpers
 
 import (
 	"github.com/newclarity/buildtool/cmd/runtime"
@@ -64,29 +64,25 @@ func NewArgTemplate(debugMode bool) *ArgTemplate {
 }
 
 
-func ProcessArgs(cmd *cobra.Command, args []string) *ArgTemplate {
-	tmpl := NewArgTemplate(Cmd.Debug)
-
+func (at *ArgTemplate) ProcessArgs(cmd *cobra.Command, args []string) *ux.State {
 	for range OnlyOnce {
-		tmpl = Cmd
-
-		_ = tmpl.Exec.SetArgs(cmd.Use)
-		_ = tmpl.Exec.AddArgs(args...)
+		_ = at.Exec.SetArgs(cmd.Use)
+		_ = at.Exec.AddArgs(args...)
 
 		if len(args) >= 1 {
 			ext := filepath.Ext(args[0])
 			if ext == ".json" {
-				tmpl.Json.SetPath(args[0])
+				at.Json.SetPath(args[0])
 			}
 		}
 
-		tmpl.ValidateArgs()
-		if tmpl.State.IsNotOk() {
+		at.ValidateArgs()
+		if at.State.IsNotOk() {
 			break
 		}
 	}
 
-	return tmpl
+	return at.State
 }
 
 

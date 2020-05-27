@@ -2,42 +2,44 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/newclarity/buildtool/cmd/helpers"
 	"github.com/newclarity/buildtool/defaults"
 	"github.com/newclarity/buildtool/ux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+const OnlyOnce = "1"
 
 
 //var Cmd TypeCmd
-var Cmd *ArgTemplate
+var Cmd *helpers.ArgTemplate
 var ConfigFile string
 const 	flagConfigFile  	= "config"
 
 
 func init() {
-	Cmd = NewArgTemplate(false)
+	Cmd = helpers.NewArgTemplate(false)
 
 	cobra.OnInitialize(initConfig)
 
 	//rootCmd.PersistentFlags().StringVar(&ConfigFile, flagConfigFile, fmt.Sprintf("%s-config.json", defaults.BinaryName), ux.SprintfBlue("%s: config file.", defaults.BinaryName))
 	_ = rootCmd.PersistentFlags().MarkHidden(flagConfigFile)
 
-	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.Path, FlagJsonFile, "j", DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
+	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.Path, helpers.FlagJsonFile, "j", helpers.DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.Chdir, FlagChdir, "c", false, ux.SprintfBlue("Change to directory containing %s", DefaultJsonFile))
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.ForceOverwrite, FlagForce, "f", false, ux.SprintfBlue("Force overwrite of output files."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.Chdir, helpers.FlagChdir, "c", false, ux.SprintfBlue("Change to directory containing %s", helpers.DefaultJsonFile))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.ForceOverwrite, helpers.FlagForce, "f", false, ux.SprintfBlue("Force overwrite of output files."))
 	//rootCmd.PersistentFlags().BoolVarP(&Cmd.RemoveOutput, FlagRemoveOutput, "", false, ux.SprintfBlue("Remove output file afterwards."))
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.QuietProgress, FlagQuiet, "q", false, ux.SprintfBlue("Silence progress in shell scripts."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.QuietProgress, helpers.FlagQuiet, "q", false, ux.SprintfBlue("Silence progress in shell scripts."))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.Debug, FlagDebug ,"d", false, ux.SprintfBlue("DEBUG mode."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.Debug, helpers.FlagDebug ,"d", false, ux.SprintfBlue("DEBUG mode."))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpAll, FlagHelpAll, "", false, ux.SprintfBlue("Show all help."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpAll, helpers.FlagHelpAll, "", false, ux.SprintfBlue("Show all help."))
 	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpVariables, FlagHelpVariables, "", false, ux.SprintfBlue("Help on template variables."))
 	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpFunctions, FlagHelpFunctions, "", false, ux.SprintfBlue("Help on template functions."))
 	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpExamples, FlagHelpExamples, "", false, ux.SprintfBlue("Help on template examples."))
 
-	rootCmd.Flags().BoolP(FlagVersion, "v", false, ux.SprintfBlue("Display version of " + defaults.BinaryName))
+	rootCmd.Flags().BoolP(helpers.FlagVersion, "v", false, ux.SprintfBlue("Display version of " + defaults.BinaryName))
 }
 
 
@@ -81,19 +83,18 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 	for range OnlyOnce {
 		var ok bool
 		fl := cmd.Flags()
-		tmpl := NewArgTemplate(false)
+		tmpl := helpers.NewArgTemplate(false)
 
 		// ////////////////////////////////
 		// Show version.
-		ok, _ = fl.GetBool(FlagVersion)
+		ok, _ = fl.GetBool(helpers.FlagVersion)
 		if ok {
 			Version(cmd, args)
 			Cmd.State.Clear()
 			break
 		}
 
-		tmpl = ProcessArgs(cmd, args)
-		Cmd.State = tmpl.State
+		Cmd.State = tmpl.ProcessArgs(cmd, args)
 		if Cmd.State.IsNotOk() {
 			Cmd.State.PrintResponse()
 			_ = cmd.Help()
@@ -120,7 +121,7 @@ func Execute() *ux.State {
 		SetHelp(rootCmd)
 
 		if Cmd == nil {
-			Cmd = NewArgTemplate(false)
+			Cmd = helpers.NewArgTemplate(false)
 		}
 
 		err = rootCmd.Execute()

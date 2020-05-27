@@ -1,4 +1,4 @@
-package cmd
+package helpers
 
 import (
 	"bytes"
@@ -48,45 +48,86 @@ func NewExecCommand(debugMode bool) *TypeExecCommand {
 }
 
 
-func ExecCommand(cmd string, args ...string) *TypeExecCommand {
-	e := NewExecCommand(Cmd.Debug)
+//func ExecCommand(cmd string, args ...string) *TypeExecCommand {
+//	e := NewExecCommand(Cmd.Debug)
+//
+//	for range OnlyOnce {
+//		if e.State.IsNotOk() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//
+//		Cmd.State = e.SetPath(cmd)
+//		if Cmd.State.IsNotOk() {
+//			Cmd.State.PrintResponse()
+//			break
+//		}
+//
+//		if e.IsNotRunnable() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//
+//		Cmd.State = e.SetArgs(args...)
+//		if Cmd.State.IsNotOk() {
+//			Cmd.State.PrintResponse()
+//			break
+//		}
+//		e.ShowProgress()
+//
+//		if Cmd.Debug {
+//			ux.PrintflnBlue("# Executing: %s %s", e.exe, strings.Join(e.args, " "))
+//		}
+//		Cmd.State = e.Run()
+//		if Cmd.State.IsNotOk() {
+//			Cmd.State.PrintResponse()
+//			break
+//		}
+//	}
+//
+//	return e
+//}
 
-	for range OnlyOnce {
-		if e.State.IsNotOk() {
-			e.State.PrintResponse()
-			break
-		}
 
-		Cmd.State = e.SetPath(cmd)
-		if Cmd.State.IsNotOk() {
-			Cmd.State.PrintResponse()
-			break
-		}
-
-		if e.IsNotRunnable() {
-			e.State.PrintResponse()
-			break
-		}
-
-		Cmd.State = e.SetArgs(args...)
-		if Cmd.State.IsNotOk() {
-			Cmd.State.PrintResponse()
-			break
-		}
-		e.ShowProgress()
-
-		if Cmd.Debug {
-			ux.PrintflnBlue("# Executing: %s %s", e.exe, strings.Join(e.args, " "))
-		}
-		Cmd.State = e.Run()
-		if Cmd.State.IsNotOk() {
-			Cmd.State.PrintResponse()
-			break
-		}
-	}
-
-	return e
-}
+//func ExecCommand(cmd string, args ...string) *TypeExecCommand {
+//	e := NewExecCommand(Cmd.Debug)
+//
+//	for range OnlyOnce {
+//		if e.State.IsNotOk() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//
+//		e.State = e.SetPath(cmd)
+//		if e.State.IsNotOk() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//
+//		if e.IsNotRunnable() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//
+//		e.State = e.SetArgs(args...)
+//		if e.State.IsNotOk() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//		e.ShowProgress()
+//
+//		if e.debug {
+//			ux.PrintflnBlue("# Executing: %s %s", e.exe, strings.Join(e.args, " "))
+//		}
+//		e.State = e.Run()
+//		if e.State.IsNotOk() {
+//			e.State.PrintResponse()
+//			break
+//		}
+//	}
+//
+//	return e
+//}
 
 
 func (e *TypeExecCommand) IsNil() *ux.State {
