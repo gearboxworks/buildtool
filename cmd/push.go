@@ -189,14 +189,13 @@ func (g *TypeGit) IsTagExisting(version string) bool {
 			version = "v" + version
 		}
 
+		ok = false
 		for _, t := range state.OutputArray {
 			if t == version {
 				ok = true
 				break
 			}
 		}
-
-		ok = false
 	}
 
 	return ok
