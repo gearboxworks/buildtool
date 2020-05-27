@@ -37,6 +37,35 @@ func Push(cmd *cobra.Command, args []string) {
 }
 
 
+func GitChanges() []string {
+	state := ux.NewState(Cmd.Debug)
+	var changes []string
+
+	for range OnlyOnce {
+		git := NewGit(nil, Cmd.Debug, ".")
+		state = git.Open()
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnBlue("Adding files to repo...")
+		state = git.Exec("status", "--porcelain")
+		if state.IsNotOk() {
+			break
+		}
+
+		for _, fp := range state.OutputArray {
+			s := strings.Fields(fp)
+			if len(s) > 1 {
+				changes = append(changes, fp)
+			}
+		}
+	}
+
+	return changes
+}
+
+
 func GitPush(comment string, args ...string) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
@@ -60,10 +89,13 @@ func GitPush(comment string, args ...string) *ux.State {
 			break
 		}
 
-		ux.PrintflnBlue("Committing files to repo...")
-		state = git.Exec("commit", "-m", c, ".")
-		if state.IsNotOk() {
-			break
+		changes := GitChanges()
+		if len(changes) > 0 {
+			ux.PrintflnBlue("Committing files to repo...")
+			state = git.Exec("commit", "-m", c, ".")
+			if state.IsNotOk() {
+				break
+			}
 		}
 
 		ux.PrintflnBlue("Pushing repo...")

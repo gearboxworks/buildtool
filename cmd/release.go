@@ -37,6 +37,7 @@ func Release(cmd *cobra.Command, args []string) {
 			break
 		}
 
+
 		Cmd.State = GitPush("Commit before release v%s", version)
 		if Cmd.State.IsNotOk() {
 			break
