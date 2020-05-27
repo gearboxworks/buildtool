@@ -26,9 +26,9 @@ var versionCmd = &cobra.Command{
 func Version(cmd *cobra.Command, args []string) {
 	for range OnlyOnce {
 		// Add sub-commands.
-		cmd.AddCommand(versionUpdateCmd)
-		cmd.AddCommand(versionPublishCmd)
-		cmd.AddCommand(versionShowCmd)
+		//cmd.AddCommand(versionUpdateCmd)
+		//cmd.AddCommand(versionPublishCmd)
+		//cmd.AddCommand(versionShowCmd)
 
 		switch {
 			case len(args) == 0:
@@ -94,8 +94,9 @@ func VersionUpdate(cmd *cobra.Command, args []string) {
 
 
 func selfUpdate(slug string) error {
-	selfupdate.EnableLog()
+	//selfupdate.EnableLog()
 
+	ux.PrintflnOk("Checking for more recent version: v%s", defaults.BinaryVersion)
 	previous := semver.MustParse(defaults.BinaryVersion)
 	latest, err := selfupdate.UpdateSelf(previous, slug)
 	if err != nil {
@@ -106,7 +107,9 @@ func selfUpdate(slug string) error {
 		ux.PrintflnOk("%s is up to date: v%s", defaults.BinaryName, defaults.BinaryVersion)
 	} else {
 		ux.PrintflnOk("%s updated to v%s", defaults.BinaryName, latest.Version)
-		ux.PrintflnOk("%s Release Notes:\n%s", latest.ReleaseNotes)
+		if latest.ReleaseNotes != "" {
+			ux.PrintflnOk("%s %s Release Notes:\n%s", defaults.BinaryName, latest.Version, latest.ReleaseNotes)
+		}
 	}
 
 	return nil

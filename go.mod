@@ -36,4 +36,4 @@ require (
 )
 
 replace github.com/newclarity/buildtool => ./
-replace github.com/rhysd/go-github-selfupdate => ./selfupdate
+// replace github.com/rhysd/go-github-selfupdate => ./selfupdate
