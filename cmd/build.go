@@ -27,7 +27,6 @@ func Build(cmd *cobra.Command, args []string) {
 		//Cmd.State.DebugPrint()
 
 
-		// //////////
 		Cmd.State = GoReleaserBuild()
 		if Cmd.State.IsNotOk() {
 			break
@@ -41,15 +40,15 @@ func GoReleaserBuild() *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
-		exe := NewExecCommand(Cmd.Debug)
-		exe.ShowProgress()
-
 		grFile := NewArgFile(Cmd.Debug)
 		state = grFile.SetPath(GoReleaserFile)
 		if grFile.NotExists() {
 			state = grFile.State
 			break
 		}
+
+		exe := NewExecCommand(Cmd.Debug)
+		exe.ShowProgress()
 
 		ux.PrintflnBlue("Found goreleaser file: %s", GoReleaserFile)
 		state = exe.Exec("goreleaser", "--snapshot", "--skip-publish", "--rm-dist")

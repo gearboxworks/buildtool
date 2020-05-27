@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/newclarity/buildtool/ux"
 	"github.com/spf13/cobra"
 	"strings"
@@ -27,8 +28,8 @@ func Push(cmd *cobra.Command, args []string) {
 			break
 		}
 
-		// //////////
-		Cmd.State = GitPush(args...)
+
+		Cmd.State = GitPush("%s", strings.Join(args, " "))
 		if Cmd.State.IsNotOk() {
 			break
 		}
@@ -36,11 +37,11 @@ func Push(cmd *cobra.Command, args []string) {
 }
 
 
-func GitPush(comment ...string) *ux.State {
+func GitPush(comment string, args ...string) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
-		c := strings.Join(comment, " ")
+		c := fmt.Sprintf(comment, args)
 		if c == "" {
 			state.SetError("Missing comment to git commit.")
 			break
@@ -67,6 +68,47 @@ func GitPush(comment ...string) *ux.State {
 
 		ux.PrintflnBlue("Pushing repo...")
 		state = git.Exec("push")
+		if state.IsNotOk() {
+			break
+		}
+	}
+
+	return state
+}
+
+
+func GitTag(version string, comment string, args ...string) *ux.State {
+	state := ux.NewState(Cmd.Debug)
+
+	for range OnlyOnce {
+		if version == "" {
+			state.SetError("Missing tag version.")
+			break
+		}
+		if !strings.HasPrefix(version, "v") {
+			version = "v" + version
+		}
+
+		c := fmt.Sprintf(comment, args)
+		if c == "" {
+			c = fmt.Sprintf("Commit before release %s", version)
+		}
+
+		git := NewGit(nil, Cmd.Debug, ".")
+		state = git.Open()
+		if state.IsNotOk() {
+			break
+		}
+		ux.PrintflnBlue("Found git repo: %s", git.Url)
+
+		ux.PrintflnBlue("Tagging version in repo...")
+		state = git.Exec("tag", "-a", version, "-m", c)
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnBlue("Pushing to origin...")
+		state = git.Exec("push", "origin", version)
 		if state.IsNotOk() {
 			break
 		}
