@@ -127,7 +127,7 @@ func (g *TypeGit) AddTag(version string, comment string, args ...interface{}) *u
 			c = fmt.Sprintf("Commit before release %s", version)
 		}
 
-		ux.PrintflnBlue("Tagging version in repo...")
+		ux.PrintflnBlue("Tagging version %s in repo...", version)
 		state = g.Exec("tag", "-a", version, "-m", c)
 		if state.IsNotOk() {
 			break
@@ -185,7 +185,7 @@ func (g *TypeGit) IsTagExisting(version string) bool {
 	var ok bool
 
 	for range OnlyOnce {
-		ux.PrintflnBlue("Checking tag %s in repo...", version)
+		//ux.PrintflnBlue("Checking tag %s in repo...", version)
 		state = g.Exec("tag", "-l", version)
 		if state.IsNotOk() {
 			break
