@@ -37,7 +37,7 @@ func Release(cmd *cobra.Command, args []string) {
 			break
 		}
 
-		Cmd.State = GitPush("Commit before release %s", version)
+		Cmd.State = GitPush("Commit before release v%s", version)
 		if Cmd.State.IsNotOk() {
 			break
 		}
@@ -74,7 +74,7 @@ func GoReleaserRelease() *ux.State {
 		ux.PrintflnBlue("Found goreleaser file: %s", GoReleaserFile)
 		state = exe.Exec("goreleaser", "--rm-dist")
 		if state.IsNotOk() {
-			ux.PrintflnWarning("No goreleaser file found.")
+			ux.PrintflnWarning("Error with goreleaser.")
 			break
 		}
 	}
