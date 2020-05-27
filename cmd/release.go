@@ -38,19 +38,27 @@ func Release(cmd *cobra.Command, args []string) {
 		}
 
 
-		Cmd.State = GitPush("Commit before release v%s", version)
+		git := NewGit(nil, Cmd.Debug, ".")
+		Cmd.State = git.Open()
+		if Cmd.State.IsNotOk() {
+			break
+		}
+		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
+
+
+		Cmd.State = git.Push("Commit before release v%s", version)
 		if Cmd.State.IsNotOk() {
 			break
 		}
 
 
-		Cmd.State = GitDelTag(version)
+		Cmd.State = git.DelTag(version)
 		if Cmd.State.IsNotOk() {
 			break
 		}
 
 
-		Cmd.State = GitAddTag(version, "Release %s", version)
+		Cmd.State = git.AddTag(version, "Release %s", version)
 		if Cmd.State.IsNotOk() {
 			break
 		}

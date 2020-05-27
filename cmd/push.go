@@ -29,7 +29,15 @@ func Push(cmd *cobra.Command, args []string) {
 		}
 
 
-		Cmd.State = GitPush("%s", strings.Join(args, " "))
+		git := NewGit(nil, Cmd.Debug, ".")
+		Cmd.State = git.Open()
+		if Cmd.State.IsNotOk() {
+			break
+		}
+		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
+
+
+		Cmd.State = git.Push("%s", strings.Join(args, " "))
 		if Cmd.State.IsNotOk() {
 			break
 		}
@@ -37,19 +45,13 @@ func Push(cmd *cobra.Command, args []string) {
 }
 
 
-func GitChanges() []string {
+func (g *TypeGit) FileChanges() []string {
 	state := ux.NewState(Cmd.Debug)
 	var changes []string
 
 	for range OnlyOnce {
-		git := NewGit(nil, Cmd.Debug, ".")
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-
 		ux.PrintflnBlue("Checking files in repo...")
-		state = git.Exec("status", "--porcelain")
+		state = g.Exec("status", "--porcelain")
 		if state.IsNotOk() {
 			break
 		}
@@ -66,7 +68,7 @@ func GitChanges() []string {
 }
 
 
-func GitPush(comment string, args ...interface{}) *ux.State {
+func (g *TypeGit) Push(comment string, args ...interface{}) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
@@ -76,30 +78,23 @@ func GitPush(comment string, args ...interface{}) *ux.State {
 			break
 		}
 
-		git := NewGit(nil, Cmd.Debug, ".")
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-		ux.PrintflnBlue("Found git repo. Pushing to remote: %s", git.Url)
-
 		ux.PrintflnBlue("Adding files to repo...")
-		state = git.Exec("add", ".")
+		state = g.Exec("add", ".")
 		if state.IsNotOk() {
 			break
 		}
 
-		changes := GitChanges()
+		changes := g.FileChanges()
 		if len(changes) > 0 {
 			ux.PrintflnBlue("Committing files to repo...")
-			state = git.Exec("commit", "-m", c, ".")
+			state = g.Exec("commit", "-m", c, ".")
 			if state.IsNotOk() {
 				break
 			}
 		}
 
 		ux.PrintflnBlue("Pushing repo...")
-		state = git.Exec("push")
+		state = g.Exec("push")
 		if state.IsNotOk() {
 			break
 		}
@@ -109,7 +104,7 @@ func GitPush(comment string, args ...interface{}) *ux.State {
 }
 
 
-func GitAddTag(version string, comment string, args ...interface{}) *ux.State {
+func (g *TypeGit) AddTag(version string, comment string, args ...interface{}) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
@@ -126,21 +121,14 @@ func GitAddTag(version string, comment string, args ...interface{}) *ux.State {
 			c = fmt.Sprintf("Commit before release %s", version)
 		}
 
-		git := NewGit(nil, Cmd.Debug, ".")
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-		ux.PrintflnBlue("Found git repo: %s", git.Url)
-
 		ux.PrintflnBlue("Tagging version in repo...")
-		state = git.Exec("tag", "-a", version, "-m", c)
+		state = g.Exec("tag", "-a", version, "-m", c)
 		if state.IsNotOk() {
 			break
 		}
 
 		ux.PrintflnBlue("Pushing to origin...")
-		state = git.Exec("push", "origin", version)
+		state = g.Exec("push", "origin", version)
 		if state.IsNotOk() {
 			break
 		}
@@ -150,7 +138,7 @@ func GitAddTag(version string, comment string, args ...interface{}) *ux.State {
 }
 
 
-func GitDelTag(version string) *ux.State {
+func (g *TypeGit) DelTag(version string) *ux.State {
 	state := ux.NewState(Cmd.Debug)
 
 	for range OnlyOnce {
@@ -162,25 +150,19 @@ func GitDelTag(version string) *ux.State {
 			version = "v" + version
 		}
 
-		git := NewGit(nil, Cmd.Debug, ".")
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-
-		if !IsTagExisting(version) {
+		if !g.IsTagExisting(version) {
 			state.SetOk()
 			break
 		}
 
 		ux.PrintflnBlue("Removing version tag in repo...")
-		state = git.Exec("tag", "-d", version)
+		state = g.Exec("tag", "-d", version)
 		if state.IsNotOk() {
 			break
 		}
 
 		ux.PrintflnBlue("Pushing to origin...")
-		state = git.Exec("push", "origin", version)
+		state = g.Exec("push", "origin", version)
 		if state.IsNotOk() {
 			break
 		}
@@ -192,19 +174,13 @@ func GitDelTag(version string) *ux.State {
 }
 
 
-func IsTagExisting(version string) bool {
+func (g *TypeGit) IsTagExisting(version string) bool {
 	state := ux.NewState(Cmd.Debug)
 	var ok bool
 
 	for range OnlyOnce {
-		git := NewGit(nil, Cmd.Debug, ".")
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-
 		ux.PrintflnBlue("Checking tag %s in repo...", version)
-		state = git.Exec("tag", "-l", version)
+		state = g.Exec("tag", "-l", version)
 		if state.IsNotOk() {
 			break
 		}
