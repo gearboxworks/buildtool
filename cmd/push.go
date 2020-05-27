@@ -150,7 +150,7 @@ func (g *TypeGit) DelTag(version string) *ux.State {
 			version = "v" + version
 		}
 
-		if !g.IsTagExisting(version) {
+		if g.IsTagExisting(version) {
 			state.SetOk()
 			break
 		}
