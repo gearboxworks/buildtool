@@ -81,26 +81,3 @@ func VersionUpdate(cmd *cobra.Command, args []string) {
 		}
 	}
 }
-
-
-func selfUpdate(slug string) error {
-	//selfupdate.EnableLog()
-
-	ux.PrintflnOk("Checking for more recent version: v%s", defaults.BinaryVersion)
-	previous := semver.MustParse(defaults.BinaryVersion)
-	latest, err := selfupdate.UpdateSelf(previous, defaults.BinaryRepo)
-	if err != nil {
-		return err
-	}
-
-	if previous.Equals(latest.Version) {
-		ux.PrintflnOk("%s is up to date: v%s", defaults.BinaryName, defaults.BinaryVersion)
-	} else {
-		ux.PrintflnOk("%s updated to v%s", defaults.BinaryName, latest.Version)
-		if latest.ReleaseNotes != "" {
-			ux.PrintflnOk("%s %s Release Notes:\n%s", defaults.BinaryName, latest.Version, latest.ReleaseNotes)
-		}
-	}
-
-	return nil
-}

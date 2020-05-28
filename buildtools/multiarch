@@ -1,0 +1,16 @@
+echo off
+
+goto(){
+# Linux code here
+EXEC="$(dirname $0)/$(uname -s)/$(basename $0)"
+if [ -x "${EXEC}" ]; then exec "${EXEC}" "$@"; fi
+echo "Gearbox: Architecture not supported, ${EXEC}."
+}
+
+goto $@
+exit
+
+:(){
+rem Windows script here
+echo %OS%
+exit

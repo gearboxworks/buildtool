@@ -279,7 +279,7 @@ func (g *TypeGit) AddTag(version string, comment string, args ...interface{}) *u
 
 		c := fmt.Sprintf(comment, args...)
 		if c == "" {
-			c = fmt.Sprintf("Commit before release %s", version)
+			c = fmt.Sprintf("Release %s", version)
 		}
 
 		ux.PrintflnBlue("Tagging version %s in repo...", version)

@@ -46,7 +46,7 @@ func Release(cmd *cobra.Command, args []string) {
 		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
 
 
-		Cmd.State = git.Push("Commit before release v%s", version)
+		Cmd.State = git.Push("Release commit v%s)", version)
 		if Cmd.State.IsNotOk() {
 			break
 		}

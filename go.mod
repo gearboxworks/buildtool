@@ -19,7 +19,7 @@ require (
 	github.com/huandu/xstrings v1.3.1 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/inconshreveable/log15 v0.0.0-20200109203555-b30bc20e4fd1 // indirect
-	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8 // indirect
+	github.com/kevinburke/rest v0.0.0-20200429221318-0d2892b400f8
 	github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
@@ -32,7 +32,7 @@ require (
 	github.com/tcnksm/go-gitconfig v0.1.2
 	github.com/tcnksm/go-latest v0.0.0-20170313132115-e3007ae9052e
 	github.com/tj/go-prompt v1.3.0
-	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
+	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80
 	github.com/tsuyoshiwada/go-gitcmd v0.0.0-20180205145712-5f1f5f9475df
 	github.com/voxelbrain/goptions v0.0.0-20180630082107-58cddc247ea2
 	github.com/zloylos/grsync v0.0.0-20200204095520-71a00a7141be
