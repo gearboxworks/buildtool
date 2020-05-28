@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"github.com/newclarity/buildtool/cmd/helpers/pkgreflect"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd/helpers/pkgreflect"
+	"github.com/gearboxworks/buildtool/ux"
 	"os"
 )
 

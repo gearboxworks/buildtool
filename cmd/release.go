@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/newclarity/buildtool/cmd/helpers"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd/helpers"
+	"github.com/gearboxworks/buildtool/ux"
 	"github.com/spf13/cobra"
 )
 

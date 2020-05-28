@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/ux"
 	"io/ioutil"
 	"os"
 	"path/filepath"

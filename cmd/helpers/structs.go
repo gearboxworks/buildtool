@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"github.com/newclarity/buildtool/cmd/runtime"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd/runtime"
+	"github.com/gearboxworks/buildtool/ux"
 	"github.com/spf13/cobra"
 	"path/filepath"
 )

@@ -1,4 +1,4 @@
-module github.com/newclarity/buildtool
+module github.com/gearboxworks/buildtool
 
 go 1.12
 
@@ -42,6 +42,6 @@ require (
 // github.com/rhysd/go-github-selfupdate/selfupdate v0.0.0
 )
 
-replace github.com/newclarity/buildtool => ./
+replace github.com/gearboxworks/buildtool => ./
 
 // replace github.com/rhysd/go-github-selfupdate => ./selfupdate

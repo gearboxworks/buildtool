@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/ux"
 )
 
 const GoReleaserFile = ".goreleaser.yml"

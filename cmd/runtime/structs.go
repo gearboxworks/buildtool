@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	"github.com/newclarity/buildtool/defaults"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/defaults"
+	"github.com/gearboxworks/buildtool/ux"
 	"os"
 	"path"
 	"path/filepath"

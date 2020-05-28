@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/newclarity/buildtool/cmd"
-	"github.com/newclarity/buildtool/defaults"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd"
+	"github.com/gearboxworks/buildtool/defaults"
+	"github.com/gearboxworks/buildtool/ux"
 	"os"
 	"strings"
 )

@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"fmt"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/ux"
 	"github.com/tsuyoshiwada/go-gitcmd"
 	"gopkg.in/src-d/go-git.v4"
 	"strings"

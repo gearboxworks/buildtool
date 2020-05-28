@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/newclarity/buildtool/cmd/helpers"
-	"github.com/newclarity/buildtool/defaults"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd/helpers"
+	"github.com/gearboxworks/buildtool/defaults"
+	"github.com/gearboxworks/buildtool/ux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	githubrelease "github.com/newclarity/buildtool/cmd/helpers/github-release"
-	"github.com/newclarity/buildtool/ux"
+	githubrelease "github.com/gearboxworks/buildtool/cmd/helpers/github-release"
+	"github.com/gearboxworks/buildtool/ux"
 	"os"
 )
 

@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"bytes"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/ux"
 	"io"
 	"os"
 	"os/exec"

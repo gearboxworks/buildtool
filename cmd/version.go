@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 	"github.com/blang/semver"
-	"github.com/newclarity/buildtool/cmd/helpers"
-	"github.com/newclarity/buildtool/defaults"
-	"github.com/newclarity/buildtool/ux"
+	"github.com/gearboxworks/buildtool/cmd/helpers"
+	"github.com/gearboxworks/buildtool/defaults"
+	"github.com/gearboxworks/buildtool/ux"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 )
