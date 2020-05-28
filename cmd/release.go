@@ -32,7 +32,7 @@ func Release(cmd *cobra.Command, args []string) {
 		}
 
 
-		version, Cmd.State = tmpl.DiscoverVersion("BinaryVersion", "defaults", "version.go")
+		version, Cmd.State = tmpl.GetBinaryVersion(helpers.DefaultVersionFile...)
 		if Cmd.State.IsNotOk() {
 			break
 		}

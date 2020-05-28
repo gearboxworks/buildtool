@@ -12,6 +12,9 @@ const (
 	CmdPush 			= "push"
 	CmdVersion 			= "version"
 	CmdRelease 			= "release"
+	CmdGet	 			= "get"
+	CmdGhr	 			= "ghr"
+	CmdPkgReflect		= "pkgreflect"
 
 	FlagJsonFile     	= "json"
 
