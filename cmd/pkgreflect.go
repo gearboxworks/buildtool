@@ -1,54 +1,33 @@
 package cmd
 
 import (
-	"github.com/gearboxworks/buildtool/cmd/helpers"
-	"github.com/gearboxworks/buildtool/ux"
-	"github.com/spf13/cobra"
+	"github.com/newclarity/scribeHelpers/loadTools"
+	"github.com/newclarity/scribeHelpers/ux"
 )
 
 
-func init() {
-	rootCmd.AddCommand(pkgreflectCmd)
-}
+func PkgReflect(path ...string) *ux.State {
+	state := Cmd.State
 
-
-var pkgreflectCmd = &cobra.Command{
-	Use:   helpers.CmdPkgReflect,
-	Short: ux.SprintfBlue("Run pkgreflect on a directory."),
-	Long:  ux.SprintfBlue("Run pkgreflect on a directory."),
-	Run:   RunPkgReflect,
-}
-func RunPkgReflect(cmd *cobra.Command, args []string) {
 	for range OnlyOnce {
-		//tmpl := helpers.NewArgTemplate(Cmd.Debug)
-		//
-		//Cmd.State = tmpl.ProcessArgs(cmd, args)
-		//if Cmd.State.IsNotOk() {
-		//	Cmd.State.PrintResponse()
-		//	break
-		//}
-		//
-		//var repo string
-		//repo, Cmd.State = tmpl.GetBinaryRepo(helpers.DefaultVersionFile...)
-		//if Cmd.State.IsNotOk() {
-		//	break
-		//}
-
-		//args = []string{"ux"}	// DEBUG
-		if len(args) == 0 {
-			Cmd.State.SetError("No directory specified.")
-			break
+		pr := loadTools.PkgReflect {
+			Notypes:    false,
+			Nofuncs:    false,
+			Novars:     false,
+			Noconsts:   false,
+			Unexported: false,
+			Norecurs:   false,
+			Stdout:     false,
+			Gofile:     "",
+			Notests:    false,
+			Debug:      false,
+			State:      nil,
 		}
-
-		pkgreflect := helpers.NewPkgReflect(Cmd.Debug)
-		if pkgreflect.State.IsNotOk() {
+		state = loadTools.PackageReflect(pr, path...)
+		if state.IsNotOk() {
 			break
-		}
-		pkgreflect.SetArgs()	//"--stdout")
-
-		Cmd.State = pkgreflect.Run(args)
-		if Cmd.State.IsNotOk() {
-			//
 		}
 	}
+
+	return state
 }

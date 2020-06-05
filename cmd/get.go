@@ -1,28 +1,23 @@
 package cmd
 
 import (
-	"github.com/gearboxworks/buildtool/cmd/helpers"
-	"github.com/gearboxworks/buildtool/ux"
-	"github.com/spf13/cobra"
+	"github.com/newclarity/scribeHelpers/toolPath"
+	"github.com/newclarity/scribeHelpers/ux"
 	"strings"
 )
 
 
-func init() {
-	rootCmd.AddCommand(getCmd)
-}
+func Get(args ...string) *ux.State {
+	state := Cmd.State
 
-
-var getCmd = &cobra.Command{
-	Use:   helpers.CmdGet,
-	Short: ux.SprintfBlue("Get value from GoLang src."),
-	Long:  ux.SprintfBlue("Get value from GoLang src code."),
-	Run:   Get,
-}
-func Get(cmd *cobra.Command, args []string) {
 	for range OnlyOnce {
 		if len(args) == 0 {
-			ux.PrintflnYellow("Need to supply one of: 'all', 'name', 'version', 'srcrepo', 'src', 'binrepo', 'bin'")
+			ux.PrintflnYellow("Need to supply one of:")
+			ux.PrintflnYellow("\t'all' - Show all of the below.")
+			ux.PrintflnYellow("\t'name' - Show the binary name.")
+			ux.PrintflnYellow("\t'version' - Show the binary version.")
+			ux.PrintflnYellow("\t'src' - Show the Git source repo.")
+			ux.PrintflnYellow("\t'bin' - Show the Git binary repo.")
 			break
 		}
 
@@ -30,47 +25,39 @@ func Get(cmd *cobra.Command, args []string) {
 			args = []string{"name", "version", "src", "bin"}
 		}
 
-		tmpl := helpers.NewArgTemplate(Cmd.Debug)
-
-		Cmd.State = tmpl.ProcessArgs(cmd, args)
-		if Cmd.State.IsNotOk() {
-			Cmd.State.PrintResponse()
-			break
-		}
-
 		for _, v := range args {
 			k := ""
 			v = strings.ToLower(v)
 			switch {
-				case v == "name":
-					k = "Name"
-					v = helpers.BinaryName
+			case v == "name":
+				k = "Name"
+				v = BinaryName
 
-				case v == "ver":
-					fallthrough
-				case v == "version":
-					k = "Version"
-					v = helpers.BinaryVersion
+			case v == "ver":
+				fallthrough
+			case v == "version":
+				k = "Version"
+				v = BinaryVersion
 
-				case v == "src":
-					fallthrough
-				case v == "source":
-					fallthrough
-				case v == "srcrepo":
-					k = "Source Repo"
-					v = helpers.SourceRepo
+			case v == "src":
+				fallthrough
+			case v == "source":
+				fallthrough
+			case v == "srcrepo":
+				k = "Source Repo"
+				v = SourceRepo
 
-				case v == "bin":
-					fallthrough
-				case v == "binary":
-					fallthrough
-				case v == "binrepo":
-					k = "Binary Repo"
-					v = helpers.BinaryRepo
+			case v == "bin":
+				fallthrough
+			case v == "binary":
+				fallthrough
+			case v == "binrepo":
+				k = "Binary Repo"
+				v = BinaryRepo
 			}
 
-			v, Cmd.State = tmpl.GetValue(v, helpers.DefaultVersionFile...)
-			if Cmd.State.IsNotOk() {
+			v, state = getValue(v, DefaultVersionFile...)
+			if state.IsNotOk() {
 				continue
 			}
 
@@ -80,4 +67,172 @@ func Get(cmd *cobra.Command, args []string) {
 			ux.PrintflnCyan("%s", v)
 		}
 	}
+
+	return state
+}
+
+const (
+	BinaryName = "BinaryName"
+	BinaryVersion = "BinaryVersion"
+	BinaryRepo = "BinaryRepo"
+	SourceRepo = "SourceRepo"
+)
+
+
+var DefaultVersionFile = []string{"defaults", "version.go"}
+
+
+func getValue(lookfor string, path ...string) (string, *ux.State) {
+	var version string
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if len(path) == 0 {
+			path = []string{"."}
+		}
+
+		grFile := toolPath.New(Cmd.Runtime)
+		grFile.SetPath(path...)
+
+		state = grFile.StatPath()
+		if state.IsNotOk() {
+			break
+		}
+
+		state = grFile.ReadFile()
+		if state.IsNotOk() {
+			break
+		}
+
+		for _, v := range grFile.GetContentArray() {
+			if !strings.Contains(v, lookfor) {
+				continue
+			}
+
+			sa := strings.Split(v, "=")
+			if len(sa) != 2 {
+				continue
+			}
+
+			version = strings.TrimSpace(sa[1])
+			version = strings.TrimPrefix(version, "\"")
+			version = strings.TrimSuffix(version, "\"")
+			break
+		}
+
+		//
+	}
+
+	return version, state
+}
+
+
+func getBinaryVersion(path ...string) (string, *ux.State) {
+	return getValue(BinaryVersion, path...)
+}
+
+
+func getBinaryName(path ...string) (string, *ux.State) {
+	return getValue(BinaryName, path...)
+}
+
+
+func getBinaryRepo(path ...string) (string, *ux.State) {
+	return getValue(BinaryRepo, path...)
+}
+
+
+func getSourceRepo(path ...string) (string, *ux.State) {
+	return getValue(SourceRepo, path...)
+}
+
+
+func getSourceOwner(path ...string) (string, *ux.State) {
+	var owner string
+	state := Cmd.State
+
+	for range OnlyOnce {
+		owner, state = getValue(SourceRepo, path...)
+		owner, _ = GetRepoComponents(owner)
+		state.SetOk()
+	}
+
+	return owner, state
+}
+
+
+func getSourceRepoName(path ...string) (string, *ux.State) {
+	var name string
+	state := Cmd.State
+
+	for range OnlyOnce {
+		name, state = getValue(SourceRepo, path...)
+		name, _ = GetRepoComponents(name)
+		state.SetOk()
+	}
+
+	return name, state
+}
+
+
+func getBinaryOwner(path ...string) (string, *ux.State) {
+	var owner string
+	state := Cmd.State
+
+	for range OnlyOnce {
+		owner, state = getValue(BinaryRepo, path...)
+		owner, _ = GetRepoComponents(owner)
+		state.SetOk()
+	}
+
+	return owner, state
+}
+
+
+func getBinaryRepoName(path ...string) (string, *ux.State) {
+	var name string
+	state := Cmd.State
+
+	for range OnlyOnce {
+		name, state = getValue(BinaryRepo, path...)
+		name, _ = GetRepoComponents(name)
+		state.SetOk()
+	}
+
+	return name, state
+}
+
+
+func GetRepoComponents(url string) (string, string) {
+	var owner string
+	var name string
+
+	for range OnlyOnce {
+		url = StripUrlPrefix(url)
+		ua := strings.Split(url, "/")
+		switch len(ua) {
+			case 0:
+				break
+			case 1:
+				owner = ua[0]
+			case 2:
+				owner = ua[0]
+				name = ua[1]
+			default:
+				owner = ua[0]
+				name = ua[1]
+		}
+	}
+
+	return owner, name
+}
+
+
+func StripUrlPrefix(url string) string {
+	url = strings.TrimPrefix(url, "https://")
+	url = strings.TrimPrefix(url, "github.com/")
+	url = strings.TrimSuffix(url, "/")
+	url = strings.TrimSpace(url)
+
+	return url
 }

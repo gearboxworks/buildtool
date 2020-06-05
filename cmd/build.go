@@ -1,37 +1,100 @@
 package cmd
 
 import (
-	"github.com/gearboxworks/buildtool/cmd/helpers"
-	"github.com/gearboxworks/buildtool/ux"
-	"github.com/spf13/cobra"
+	"github.com/newclarity/scribeHelpers/toolGit"
+	"github.com/newclarity/scribeHelpers/toolGoReleaser"
+	"github.com/newclarity/scribeHelpers/ux"
 )
 
 
-func init() {
-	rootCmd.AddCommand(buildCmd)
-}
+func Build(path ...string) *ux.State {
+	state := Cmd.State
 
-
-var buildCmd = &cobra.Command{
-	Use:   helpers.CmdBuild,
-	Short: ux.SprintfBlue("Build a gearboxworks repo."),
-	Long: ux.SprintfBlue("Build a gearboxworks repo."),
-	Run: Build,
-}
-func Build(cmd *cobra.Command, args []string) {
 	for range OnlyOnce {
-		tmpl := helpers.NewArgTemplate(Cmd.Debug)
+		if len(path) == 0 {
+			path = []string{"."}
+		}
 
-		Cmd.State = tmpl.ProcessArgs(cmd, args)
-		if Cmd.State.IsNotOk() {
+		gr := toolGoReleaser.New(Cmd.Runtime)
+		if gr.State.IsNotOk() {
+			state = gr.State
 			break
 		}
-		//Cmd.State.DebugPrint()
 
-
-		Cmd.State = tmpl.GoReleaserBuild()
-		if Cmd.State.IsNotOk() {
+		state = gr.Build(path...)
+		if state.IsNotOk() {
 			break
 		}
 	}
+
+	return state
+}
+
+
+func Release(path ...string) *ux.State {
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if len(path) == 0 {
+			path = []string{"."}
+		}
+
+
+		var version string
+		version, state = getBinaryVersion(DefaultVersionFile...)
+		if state.IsNotOk() {
+			break
+		}
+
+
+		git := toolGit.New(Cmd.Runtime)
+		if git.State.IsNotOk() {
+			state = git.State
+			break
+		}
+
+		state = git.SetPath(path...)
+		if state.IsNotOk() {
+			break
+		}
+
+		state = git.Open()
+		if state.IsNotOk() {
+			break
+		}
+		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
+
+
+		state = git.Push("Pre-commit Release v%s", version)
+		if state.IsNotOk() {
+			break
+		}
+
+
+		state = git.DelTag(version)
+		if state.IsNotOk() {
+			break
+		}
+
+
+		state = git.AddTag(version, "Release %s", version)
+		if state.IsNotOk() {
+			break
+		}
+
+
+		gr := toolGoReleaser.New(Cmd.Runtime)
+		if gr.State.IsNotOk() {
+			state = gr.State
+			break
+		}
+
+		gr.ShowProgress()
+		state = gr.Release(path...)
+		if state.IsNotOk() {
+			break
+		}
+	}
+
+	return state
 }

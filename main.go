@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/gearboxworks/buildtool/cmd"
 	"github.com/gearboxworks/buildtool/defaults"
-	"github.com/gearboxworks/buildtool/ux"
+	"github.com/newclarity/scribeHelpers/ux"
 	"os"
 	"strings"
 )
@@ -14,14 +14,14 @@ func init() {
 
 func main() {
 	state := cmd.Execute()
-	if state.IsNotOk() {
-		state.PrintResponse()
-	}
+	state.PrintResponse()
 	ux.Close()
 	os.Exit(state.ExitCode)
 }
 
 /*
+
+@DONE - BUG - pkgreflect args not being properly set.
 
 @TODO - Add 'setup' command that
 @TODO -		Creates a Makefile.
@@ -32,4 +32,32 @@ func main() {
 @TODO - Add git ignore tag to the 'buildtool' binary.
 @TODO -		git update-index --assume-unchanged buildtool
 
+
+************************************************************************
+Makefile:
+        @echo "Pushing to: $(shell git branch)"
+        @git config core.hooksPath .git-hooks
+
+doc:
+ifeq ($(GODOCMD),)
+        @echo "godocdown - Installing"
+        @go install github.com/robertkrimen/godocdown/godocdown
+else
+        @echo "godocdown - already installed here $(GODOCMD)"
+endif
+        @$(GODOCMD)
+
+
+BINARYREPO="$(tools/getBinaryRepo.sh)"
+USER="$(echo "${BINARYREPO}" | awk -F/ '{print$1}')"
+REPO="$(echo "${BINARYREPO}" | awk -F/ '{print$1}')"
+
+VERSION="$(tools/getBinaryVersion.sh)"
+
+echo github-release release \
+        --user "${USER}" \
+        --repo "${GB_GITREPO}" \
+        --tag "${VERSION}" \
+        --name "Release ${VERSION}" \
+        --description "${DESCRIPTION}"
 */
