@@ -60,11 +60,11 @@ func Release(path ...string) *ux.State {
 		if state.IsNotOk() {
 			break
 		}
-		state = repo.DelTag(version)
+		state = GitDelTag(repo, version)
 		if state.IsNotOk() {
 			break
 		}
-		state = repo.AddTag(version, "Release %s", version)
+		state = GitAddTag(repo, version, "Release %s", version)
 		if state.IsNotOk() {
 			break
 		}

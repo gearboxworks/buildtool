@@ -40,6 +40,30 @@ func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.S
 }
 
 
+func GitAddTag(repo *toolGit.TypeGit, tag string, comment string, args ...interface{}) *ux.State {
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
+
+		ux.PrintflnBlue("Add tag '%s' on Git repo '%s'", tag, repo.Url)
+		state = repo.AddTag(tag, comment)
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnGreen("OK")
+	}
+
+	return state
+}
+
+
 func GitPush(repo *toolGit.TypeGit) *ux.State {
 	state := Cmd.State
 
@@ -76,30 +100,6 @@ func GitPull(repo *toolGit.TypeGit) *ux.State {
 
 		ux.PrintflnBlue("Pulling Git repo '%s'", repo.Url)
 		state = repo.Pull()
-		if state.IsNotOk() {
-			break
-		}
-
-		ux.PrintflnGreen("OK")
-	}
-
-	return state
-}
-
-
-func GitAddTag(repo *toolGit.TypeGit, tag string, comment string) *ux.State {
-	state := Cmd.State
-
-	for range OnlyOnce {
-		if repo == nil {
-			repo = GitOpen()
-			if repo.State.IsNotOk() {
-				break
-			}
-		}
-
-		ux.PrintflnBlue("Add tag '%s' on Git repo '%s'", tag, repo.Url)
-		state = repo.AddTag(tag, comment)
 		if state.IsNotOk() {
 			break
 		}
