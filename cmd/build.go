@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"github.com/newclarity/scribeHelpers/toolGit"
 	"github.com/newclarity/scribeHelpers/toolGoReleaser"
 	"github.com/newclarity/scribeHelpers/ux"
 )
@@ -12,7 +11,7 @@ func Build(path ...string) *ux.State {
 
 	for range OnlyOnce {
 		if len(path) == 0 {
-			path = []string{"."}
+			path = []string{Cmd.WorkingPath.GetPath()}
 		}
 
 		gr := toolGoReleaser.New(Cmd.Runtime)
@@ -36,10 +35,11 @@ func Release(path ...string) *ux.State {
 
 	for range OnlyOnce {
 		if len(path) == 0 {
-			path = []string{"."}
+			path = []string{Cmd.WorkingPath.GetPath()}
 		}
 
 
+		// Fetch version from GoLang files.
 		var version string
 		version, state = getBinaryVersion(DefaultVersionFile...)
 		if state.IsNotOk() {
@@ -47,42 +47,30 @@ func Release(path ...string) *ux.State {
 		}
 
 
-		git := toolGit.New(Cmd.Runtime)
-		if git.State.IsNotOk() {
-			state = git.State
+		// Sync GitHub repo.
+		repo := GitOpen()
+		if repo.State.IsNotOk() {
 			break
 		}
-
-		state = git.SetPath(path...)
+		state = GitCommit(repo, "Commit for Release v%s", version)
 		if state.IsNotOk() {
 			break
 		}
-
-		state = git.Open()
+		state = GitPush(repo)
 		if state.IsNotOk() {
 			break
 		}
-		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
-
-
-		state = git.Push("Pre-commit Release v%s", version)
+		state = repo.DelTag(version)
 		if state.IsNotOk() {
 			break
 		}
-
-
-		state = git.DelTag(version)
+		state = repo.AddTag(version, "Release %s", version)
 		if state.IsNotOk() {
 			break
 		}
 
 
-		state = git.AddTag(version, "Release %s", version)
-		if state.IsNotOk() {
-			break
-		}
-
-
+		// Run GoReleaser.
 		gr := toolGoReleaser.New(Cmd.Runtime)
 		if gr.State.IsNotOk() {
 			state = gr.State

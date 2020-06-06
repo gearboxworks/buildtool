@@ -9,9 +9,20 @@ import (
 
 
 func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []string) *ux.State {
+	state := Cmd.State
+
 	for range OnlyOnce {
-		_ = toolArgs.Runtime.SetArgs(cmd.Use)
-		_ = toolArgs.Runtime.AddArgs(args...)
+		err := toolArgs.Runtime.SetArgs(cmd.Use)
+		if err != nil {
+			state.SetError(err)
+			break
+		}
+
+		err = toolArgs.Runtime.AddArgs(args...)
+		if err != nil {
+			state.SetError(err)
+			break
+		}
 
 		if len(args) >= 1 {
 			ext := filepath.Ext(args[0])
@@ -22,11 +33,11 @@ func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []
 
 		toolArgs.Template.Filename = loadTools.SelectIgnore
 
-		toolArgs.ValidateArgs()
-		if toolArgs.State.IsNotOk() {
+		state = toolArgs.ValidateArgs()
+		if state.IsNotOk() {
 			break
 		}
 	}
 
-	return toolArgs.State
+	return state
 }

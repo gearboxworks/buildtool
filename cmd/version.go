@@ -1,9 +1,44 @@
 package cmd
 
 import (
+	"github.com/gearboxworks/buildtool/defaults"
+	"github.com/newclarity/scribeHelpers/loadTools"
 	"github.com/newclarity/scribeHelpers/toolSelfUpdate"
 	"github.com/newclarity/scribeHelpers/ux"
+	"github.com/spf13/cobra"
 )
+
+
+func init() {
+	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(selfUpdateCmd)
+}
+var versionCmd = &cobra.Command{
+	Use:   loadTools.CmdVersion,
+	Short: ux.SprintfMagenta(defaults.BinaryName) + ux.SprintfBlue(" - Show version of executable."),
+	Long:  ux.SprintfMagenta(defaults.BinaryName) + ux.SprintfBlue(" - Show version of executable."),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = ProcessArgs(Cmd, cmd, args)
+		if Cmd.State.IsNotOk() {
+			return
+		}
+
+		Cmd.State = Version()
+	},
+}
+var selfUpdateCmd = &cobra.Command{
+	Use:   loadTools.CmdSelfUpdate,
+	Short: ux.SprintfMagenta(defaults.BinaryName) + ux.SprintfBlue(" - Update version of executable."),
+	Long: ux.SprintfMagenta(defaults.BinaryName) + ux.SprintfBlue(" - Check and update the latest version."),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = ProcessArgs(Cmd, cmd, args)
+		if Cmd.State.IsNotOk() {
+			return
+		}
+
+		Cmd.State = VersionUpdate()
+	},
+}
 
 
 func Version(args ...string) *ux.State {

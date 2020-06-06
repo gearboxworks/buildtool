@@ -1,57 +1,134 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/newclarity/scribeHelpers/toolGit"
 	"github.com/newclarity/scribeHelpers/ux"
-	"strings"
 )
 
 
-func GitPush(path string, comment ...string) *ux.State {
+func GitOpen() *toolGit.TypeGit {
+	return toolGit.GitOpen(Cmd.WorkingPath.GetPath())
+}
+
+
+func GitClone(url string, path ...string) *toolGit.TypeGit {
+	return toolGit.GitClone(url, path...)
+}
+
+
+func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.State {
 	state := Cmd.State
 
 	for range OnlyOnce {
-		git := toolGit.New(Cmd.Runtime)
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
 
-		state = git.SetPath(path)
+		ux.PrintflnBlue("Pushing to Git repo '%s'", repo.Url)
+		state = repo.Commit([]string{"."}, comment, args...)
 		if state.IsNotOk() {
 			break
 		}
 
-		state = git.Open()
-		if state.IsNotOk() {
-			break
-		}
-		ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
-
-		ctxt := fmt.Sprintf("%s", strings.Join(comment, " "))
-		state = git.Push(ctxt)
-		if state.IsNotOk() {
-			break
-		}
+		ux.PrintflnGreen("OK")
 	}
 
 	return state
 }
 
 
-func GitTag(path string, comment ...string) *ux.State {
+func GitPush(repo *toolGit.TypeGit) *ux.State {
 	state := Cmd.State
 
 	for range OnlyOnce {
-		//git := toolGit.New(Cmd.Runtime)
-		//
-		//state = git.SetPath(path)
-		//if state.IsNotOk() {
-		//	break
-		//}
-		//
-		//state = git.Open()
-		//if state.IsNotOk() {
-		//	break
-		//}
-		//ux.PrintflnBlue("Found git repo. Remote URL: %s", git.Url)
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
+
+		state = repo.Push()
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnGreen("OK")
+	}
+
+	return state
+}
+
+
+func GitPull(repo *toolGit.TypeGit) *ux.State {
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
+
+		ux.PrintflnBlue("Pulling Git repo '%s'", repo.Url)
+		state = repo.Pull()
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnGreen("OK")
+	}
+
+	return state
+}
+
+
+func GitAddTag(repo *toolGit.TypeGit, tag string, comment string) *ux.State {
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
+
+		ux.PrintflnBlue("Add tag '%s' on Git repo '%s'", tag, repo.Url)
+		state = repo.AddTag(tag, comment)
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnGreen("OK")
+	}
+
+	return state
+}
+
+
+func GitDelTag(repo *toolGit.TypeGit, tag string) *ux.State {
+	state := Cmd.State
+
+	for range OnlyOnce {
+		if repo == nil {
+			repo = GitOpen()
+			if repo.State.IsNotOk() {
+				break
+			}
+		}
+
+		ux.PrintflnBlue("Delete tag '%s' on Git repo '%s'", tag, repo.Url)
+		state = repo.DelTag(tag)
+		if state.IsNotOk() {
+			break
+		}
+
+		ux.PrintflnGreen("OK")
 	}
 
 	return state

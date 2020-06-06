@@ -30,24 +30,25 @@ func init() {
 
 	cobra.OnInitialize(initConfig)
 
-	//rootCmd.PersistentFlags().StringVar(&ConfigFile, flagConfigFile, fmt.Sprintf("%s-config.json", defaults.BinaryName), ux.SprintfBlue("%s: config file.", defaults.BinaryName))
+	rootCmd.PersistentFlags().StringVar(&ConfigFile, flagConfigFile, fmt.Sprintf("%s-config.json", defaults.BinaryName), ux.SprintfBlue("%s: config file.", defaults.BinaryName))
 	_ = rootCmd.PersistentFlags().MarkHidden(flagConfigFile)
 
-	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.Filename, FlagJsonFile, "j", DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
+	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.Filename, loadTools.FlagJsonFile, "j", loadTools.DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
+	rootCmd.PersistentFlags().StringVarP(&Cmd.WorkingPath.Filename, loadTools.FlagWorkingPath, "p", loadTools.DefaultWorkingPath, ux.SprintfBlue("Set working path."))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.Chdir, FlagChdir, "c", false, ux.SprintfBlue("Change to directory containing %s", DefaultJsonFile))
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.ForceOverwrite, FlagForce, "f", false, ux.SprintfBlue("Force overwrite of output files."))
-	//rootCmd.PersistentFlags().BoolVarP(&Cmd.RemoveOutput, FlagRemoveOutput, "", false, ux.SprintfBlue("Remove output file afterwards."))
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.QuietProgress, FlagQuiet, "q", false, ux.SprintfBlue("Silence progress in shell scripts."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.Chdir, loadTools.FlagChdir, "c", false, ux.SprintfBlue("Change to directory containing %s.", DefaultJsonFile))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.ForceOverwrite, loadTools.FlagForce, "f", false, ux.SprintfBlue("Force overwrite of output files."))
+	//rootCmd.PersistentFlags().BoolVarP(&Cmd.RemoveOutput, loadTools.FlagRemoveOutput, "", false, ux.SprintfBlue("Remove output file afterwards."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.QuietProgress, loadTools.FlagQuiet, "q", false, ux.SprintfBlue("Silence progress in shell scripts."))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.Debug, FlagDebug ,"d", false, ux.SprintfBlue("DEBUG mode."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.Debug, loadTools.FlagDebug ,"d", false, ux.SprintfBlue("DEBUG mode."))
 
-	rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpAll, FlagHelpAll, "", false, ux.SprintfBlue("Show all help."))
-	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpVariables, FlagHelpVariables, "", false, ux.SprintfBlue("Help on template variables."))
-	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpFunctions, FlagHelpFunctions, "", false, ux.SprintfBlue("Help on template functions."))
-	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpExamples, FlagHelpExamples, "", false, ux.SprintfBlue("Help on template examples."))
+	rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpAll, loadTools.FlagHelpAll, "", false, ux.SprintfBlue("Show all help."))
+	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpVariables, loadTools.FlagHelpVariables, "", false, ux.SprintfBlue("Help on template variables."))
+	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpFunctions, loadTools.FlagHelpFunctions, "", false, ux.SprintfBlue("Help on template functions."))
+	//rootCmd.PersistentFlags().BoolVarP(&Cmd.HelpExamples, loadTools.FlagHelpExamples, "", false, ux.SprintfBlue("Help on template examples."))
 
-	rootCmd.Flags().BoolP(FlagVersion, "v", false, ux.SprintfBlue("Display version of " + defaults.BinaryName))
+	rootCmd.Flags().BoolP(loadTools.FlagVersion, "v", false, ux.SprintfBlue("Display version of " + defaults.BinaryName))
 }
 
 
