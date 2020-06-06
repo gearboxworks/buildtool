@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/newclarity/scribeHelpers/ux"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 //noinspection ALL
@@ -11,6 +12,7 @@ const (
 
 	CmdBuild 			= "build"
 	CmdPush 			= "push"
+	CmdCommit 			= "commit"
 	CmdPull 			= "pull"
 	CmdClone 			= "clone"
 	CmdVersion 			= "version"
@@ -25,6 +27,7 @@ const (
 func init() {
 	rootCmd.AddCommand(ghrCmd)
 	rootCmd.AddCommand(pushCmd)
+	rootCmd.AddCommand(commitCmd)
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(golangCmd)
@@ -46,6 +49,19 @@ var pushCmd = &cobra.Command{
 		}
 
 		Cmd.State = GitPush(nil)
+	},
+}
+var commitCmd = &cobra.Command{
+	Use:   CmdCommit,
+	Short: ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Commit changes to a gearboxworks repo."),
+	Long:  ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Commit changes to a gearboxworks repo."),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = ProcessArgs(Cmd, cmd, args)
+		if Cmd.State.IsNotOk() {
+			return
+		}
+
+		Cmd.State = GitCommit(nil, strings.Join(args, " "))
 	},
 }
 var pullCmd = &cobra.Command{

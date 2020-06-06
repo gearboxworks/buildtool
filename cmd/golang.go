@@ -96,10 +96,14 @@ func goLangUpdate(path ...string) *ux.State {
 }
 
 
-func PkgReflect(path ...string) *ux.State {
+func PkgReflect(paths ...string) *ux.State {
 	state := Cmd.State
 
 	for range onlyOnce {
+		if len(paths) == 0 {
+			paths = []string{"."}
+		}
+
 		pr := loadTools.PkgReflect {
 			Notypes:    false,
 			Nofuncs:    false,
@@ -113,7 +117,7 @@ func PkgReflect(path ...string) *ux.State {
 			Debug:      false,
 			State:      nil,
 		}
-		state = loadTools.PackageReflect(pr, path...)
+		state = loadTools.PackageReflect(pr, paths...)
 		if state.IsNotOk() {
 			break
 		}

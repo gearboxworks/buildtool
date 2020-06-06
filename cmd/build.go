@@ -39,6 +39,14 @@ func Release(path ...string) *ux.State {
 		}
 
 
+		// Ensure repo builds properly.
+		state = Build(path...)
+		if state.IsNotOk() {
+			state.SetError("Failed to build. Aborting...")
+			break
+		}
+
+
 		// Fetch version from GoLang files.
 		var version string
 		version, state = getBinaryVersion(DefaultVersionFile...)

@@ -23,6 +23,9 @@ func main() {
 
 @DONE - BUG - pkgreflect args not being properly set.
 
+@TODO - Add "upgrade to" command to enable semver upgrades.
+@TODO - 	In particular, handle the defaults.version.go file better.
+
 @TODO - Add 'setup' command that
 @TODO -		Creates a Makefile.
 @TODO -		Adds the Git 'assume-unchanged' thingy.

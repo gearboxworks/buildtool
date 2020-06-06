@@ -122,7 +122,7 @@ func VersionCheck() *ux.State {
 			break
 		}
 
-		state = update.IsUpdated(false)
+		state = update.IsUpdated(true)
 		if update.State.IsError() {
 			break
 		}

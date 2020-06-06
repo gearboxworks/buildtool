@@ -27,7 +27,7 @@ func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.S
 			}
 		}
 
-		ux.PrintflnBlue("Pushing to Git repo '%s'", repo.Url)
+		ux.PrintflnBlue("Committing changes to Git repo '%s'", repo.Url)
 		state = repo.Commit([]string{"."}, comment, args...)
 		if state.IsNotOk() {
 			break
