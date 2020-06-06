@@ -6,18 +6,22 @@ import (
 	"strings"
 )
 
+const (
+	BinaryName = "BinaryName"
+	BinaryVersion = "BinaryVersion"
+	BinaryRepo = "BinaryRepo"
+	SourceRepo = "SourceRepo"
+)
+
+var DefaultVersionFile = []string{"defaults", "version.go"}
+
 
 func Get(args ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(args) == 0 {
-			ux.PrintflnYellow("Need to supply one of:")
-			ux.PrintflnYellow("\t'all' - Show all of the below.")
-			ux.PrintflnYellow("\t'name' - Show the binary name.")
-			ux.PrintflnYellow("\t'version' - Show the binary version.")
-			ux.PrintflnYellow("\t'src' - Show the Git source repo.")
-			ux.PrintflnYellow("\t'bin' - Show the Git binary repo.")
+			state = GetHelp()
 			break
 		}
 
@@ -71,22 +75,23 @@ func Get(args ...string) *ux.State {
 	return state
 }
 
-const (
-	BinaryName = "BinaryName"
-	BinaryVersion = "BinaryVersion"
-	BinaryRepo = "BinaryRepo"
-	SourceRepo = "SourceRepo"
-)
 
-
-var DefaultVersionFile = []string{"defaults", "version.go"}
+func GetHelp() *ux.State {
+	ux.PrintflnYellow("Need to supply one of:")
+	ux.PrintflnYellow("\t'all' - Show all of the below.")
+	ux.PrintflnYellow("\t'name' - Show the binary name.")
+	ux.PrintflnYellow("\t'version' - Show the binary version.")
+	ux.PrintflnYellow("\t'src' - Show the Git source repo.")
+	ux.PrintflnYellow("\t'bin' - Show the Git binary repo.")
+	return Cmd.State
+}
 
 
 func getValue(lookfor string, path ...string) (string, *ux.State) {
 	var version string
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(path) == 0 {
 			path = []string{"."}
 		}
@@ -151,7 +156,7 @@ func getSourceOwner(path ...string) (string, *ux.State) {
 	var owner string
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		owner, state = getValue(SourceRepo, path...)
 		owner, _ = GetRepoComponents(owner)
 		state.SetOk()
@@ -165,7 +170,7 @@ func getSourceRepoName(path ...string) (string, *ux.State) {
 	var name string
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		name, state = getValue(SourceRepo, path...)
 		name, _ = GetRepoComponents(name)
 		state.SetOk()
@@ -179,7 +184,7 @@ func getBinaryOwner(path ...string) (string, *ux.State) {
 	var owner string
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		owner, state = getValue(BinaryRepo, path...)
 		owner, _ = GetRepoComponents(owner)
 		state.SetOk()
@@ -193,7 +198,7 @@ func getBinaryRepoName(path ...string) (string, *ux.State) {
 	var name string
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		name, state = getValue(BinaryRepo, path...)
 		name, _ = GetRepoComponents(name)
 		state.SetOk()
@@ -207,7 +212,7 @@ func GetRepoComponents(url string) (string, string) {
 	var owner string
 	var name string
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		url = StripUrlPrefix(url)
 		ua := strings.Split(url, "/")
 		switch len(ua) {

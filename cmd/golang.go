@@ -11,7 +11,7 @@ import (
 func Golang(args ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(args) == 0 {
 			goLangHelp()
 			break
@@ -43,7 +43,7 @@ func goLangHelp() *ux.State {
 func goLangUpdate(path ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(path) == 0 {
 			path = []string{"."}
 		}
@@ -99,7 +99,7 @@ func goLangUpdate(path ...string) *ux.State {
 func PkgReflect(path ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		pr := loadTools.PkgReflect {
 			Notypes:    false,
 			Nofuncs:    false,

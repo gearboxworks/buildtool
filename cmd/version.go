@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/gearboxworks/buildtool/defaults"
 	"github.com/newclarity/scribeHelpers/loadTools"
+	"github.com/newclarity/scribeHelpers/toolRuntime"
 	"github.com/newclarity/scribeHelpers/toolSelfUpdate"
 	"github.com/newclarity/scribeHelpers/ux"
 	"github.com/spf13/cobra"
@@ -23,7 +24,7 @@ var versionCmd = &cobra.Command{
 			return
 		}
 
-		Cmd.State = Version()
+		Cmd.State = Version(args...)
 	},
 }
 var selfUpdateCmd = &cobra.Command{
@@ -44,13 +45,18 @@ var selfUpdateCmd = &cobra.Command{
 func Version(args ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
+		state = VersionShow()
+
 		switch {
 			case len(args) == 0:
-				state = VersionShow()
+				state = VersionHelp()
 
 			case args[0] == "info":
-				state = VersionInfo()
+				state = VersionInfo(Cmd.Runtime.GetSemVer())
+
+			case args[0] == "latest":
+				state = VersionInfo(nil)
 
 			case args[0] == "check":
 				state = VersionCheck()
@@ -59,7 +65,7 @@ func Version(args ...string) *ux.State {
 				state = VersionUpdate()
 
 			default:
-				state = VersionShow()
+				state = VersionHelp()
 		}
 	}
 
@@ -67,29 +73,35 @@ func Version(args ...string) *ux.State {
 }
 
 
-func VersionShow() *ux.State {
-	state := Cmd.State
-
-	//fmt.Printf("%s %s\n",
-	//	ux.SprintfBlue(defaults.BinaryName),
-	//	ux.SprintfCyan("v%s", defaults.BinaryVersion),
-	//)
-
-	return state
+func VersionHelp() *ux.State {
+	ux.PrintflnYellow("Need to supply one of:")
+	ux.PrintflnYellow("\t'info' - Show info on current version.")
+	ux.PrintflnYellow("\t'latest' - Show info on latest version.")
+	ux.PrintflnYellow("\t'check' - Check for version updates.")
+	ux.PrintflnYellow("\t'update' - Update current executable.")
+	Cmd.State.Clear()
+	return Cmd.State
 }
 
 
-func VersionInfo() *ux.State {
+func VersionShow() *ux.State {
+	Cmd.Runtime.PrintNameVersion()
+	Cmd.State.Clear()
+	return Cmd.State
+}
+
+
+func VersionInfo(v *toolRuntime.VersionValue) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		update := toolSelfUpdate.New(Cmd.Runtime)
 		if update.State.IsError() {
 			state = update.State
 			break
 		}
 
-		state = update.PrintVersion(nil)
+		state = update.PrintVersion((*toolSelfUpdate.VersionValue)(v))
 		if state.IsNotOk() {
 			state = update.State
 			break
@@ -103,7 +115,7 @@ func VersionInfo() *ux.State {
 func VersionCheck() *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		update := toolSelfUpdate.New(Cmd.Runtime)
 		if update.State.IsError() {
 			state = update.State
@@ -123,7 +135,7 @@ func VersionCheck() *ux.State {
 func VersionUpdate() *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		update := toolSelfUpdate.New(Cmd.Runtime)
 		if update.State.IsError() {
 			state = update.State

@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-const OnlyOnce = "1"
+const onlyOnce = "1"
 
 
 //var Cmd2 TypeCmd
@@ -20,7 +20,6 @@ func SetCmd() {
 	if Cmd == nil {
 		Cmd = loadTools.New(defaults.BinaryName, defaults.BinaryVersion, false)
 		Cmd.Runtime.SetRepos(defaults.SourceRepo, defaults.BinaryRepo)
-		Cmd.Runtime.PrintNameVersion()
 	}
 }
 
@@ -87,7 +86,7 @@ var rootCmd = &cobra.Command{
 }
 
 func gbRootFunc(cmd *cobra.Command, args []string) {
-	for range OnlyOnce {
+	for range onlyOnce {
 		var ok bool
 		fl := cmd.Flags()
 
@@ -95,7 +94,7 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 		// Show version.
 		ok, _ = fl.GetBool(loadTools.FlagVersion)
 		if ok {
-			Version(args...)
+			VersionShow()
 			Cmd.State.Clear()
 			break
 		}
@@ -131,7 +130,6 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 
 		// Show help if no commands specified.
 		if len(args) == 0 {
-			Version(args...)
 			_ = cmd.Help()
 			Cmd.State.Clear()
 			break
@@ -143,7 +141,7 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() *ux.State {
-	for range OnlyOnce {
+	for range onlyOnce {
 		SetHelp(rootCmd)
 		SetCmd()
 

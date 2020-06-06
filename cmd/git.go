@@ -19,7 +19,7 @@ func GitClone(url string, path ...string) *toolGit.TypeGit {
 func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if repo == nil {
 			repo = GitOpen()
 			if repo.State.IsNotOk() {
@@ -43,7 +43,7 @@ func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.S
 func GitAddTag(repo *toolGit.TypeGit, tag string, comment string, args ...interface{}) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if repo == nil {
 			repo = GitOpen()
 			if repo.State.IsNotOk() {
@@ -67,7 +67,7 @@ func GitAddTag(repo *toolGit.TypeGit, tag string, comment string, args ...interf
 func GitPush(repo *toolGit.TypeGit) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if repo == nil {
 			repo = GitOpen()
 			if repo.State.IsNotOk() {
@@ -90,7 +90,7 @@ func GitPush(repo *toolGit.TypeGit) *ux.State {
 func GitPull(repo *toolGit.TypeGit) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if repo == nil {
 			repo = GitOpen()
 			if repo.State.IsNotOk() {
@@ -114,7 +114,7 @@ func GitPull(repo *toolGit.TypeGit) *ux.State {
 func GitDelTag(repo *toolGit.TypeGit, tag string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if repo == nil {
 			repo = GitOpen()
 			if repo.State.IsNotOk() {
@@ -138,7 +138,7 @@ func GitDelTag(repo *toolGit.TypeGit, tag string) *ux.State {
 func GithubReleaser(args ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		//tmpl := loadTools.NewArgTemplate(Cmd.Debug)
 		//
 		//state = tmpl.ProcessArgs(cmd, args)

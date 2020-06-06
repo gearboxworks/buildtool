@@ -33,7 +33,8 @@ func _GetVersion(c *cobra.Command) string {
 	var str string
 
 	if c.Parent() == nil {
-		str += ux.SprintfWhite("%s: v%s", defaults.BinaryName, defaults.BinaryVersion)
+		str = ux.SprintfBlue("%s ", Cmd.Runtime.CmdName)
+		str += ux.SprintfCyan("v%s", Cmd.Runtime.CmdVersion)
 	}
 
 	return str
@@ -127,7 +128,7 @@ func SetHelp(c *cobra.Command) {
 
 
 func HelpAll() {
-	for range OnlyOnce {
+	for range onlyOnce {
 		HelpFunctions()
 		HelpVariables()
 		HelpExamples()
@@ -138,8 +139,8 @@ func HelpAll() {
 
 
 func Help() {
-	for range OnlyOnce {
-		ux.PrintflnBlue("scribe v%s:", Version)
+	for range onlyOnce {
+		ux.PrintflnBlue("%s v%s:", defaults.BinaryName, defaults.BinaryVersion)
 		ux.PrintflnBlue("\tThe ultimate config file generator.")
 		ux.PrintflnBlue("\tFeed it a JSON and GoLang template file, I'll do the rest.")
 		ux.PrintflnBlue("")
@@ -157,7 +158,7 @@ func HelpFunctions() {
 	Cmd.State.Clear()
 	return
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		Cmd.PrintTools()
 	}
 
@@ -169,7 +170,7 @@ func HelpVariables() {
 	Cmd.State.Clear()
 	return
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		ux.PrintfBlue("Keys accessible within your template file:\n")
 		fmt.Printf("%s - %s\n", ux.SprintfBlue("\t{{ .Json }}"), ux.SprintfWhite("Your JSON file will appear here."))
 		fmt.Printf("\n")
@@ -217,7 +218,7 @@ func HelpExamples() {
 	Cmd.State.Clear()
 	return
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		var examples Examples
 
 

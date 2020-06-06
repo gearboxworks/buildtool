@@ -11,7 +11,7 @@ import (
 func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		err := toolArgs.Runtime.SetArgs(cmd.Use)
 		if err != nil {
 			state.SetError(err)

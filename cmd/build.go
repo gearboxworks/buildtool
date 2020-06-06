@@ -9,7 +9,7 @@ import (
 func Build(path ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(path) == 0 {
 			path = []string{Cmd.WorkingPath.GetPath()}
 		}
@@ -33,7 +33,7 @@ func Build(path ...string) *ux.State {
 func Release(path ...string) *ux.State {
 	state := Cmd.State
 
-	for range OnlyOnce {
+	for range onlyOnce {
 		if len(path) == 0 {
 			path = []string{Cmd.WorkingPath.GetPath()}
 		}

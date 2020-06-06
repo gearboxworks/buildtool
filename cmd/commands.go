@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
+//noinspection ALL
 const (
 	DefaultJsonFile 		= "buildtool.json"
 
@@ -27,8 +27,6 @@ func init() {
 	rootCmd.AddCommand(pushCmd)
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(cloneCmd)
-	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(selfUpdateCmd)
 	rootCmd.AddCommand(golangCmd)
 	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(buildCmd)
