@@ -51,6 +51,7 @@ var pushCmd = &cobra.Command{
 		Cmd.State = GitPush(nil)
 	},
 }
+
 var commitCmd = &cobra.Command{
 	Use:   CmdCommit,
 	Short: ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Commit changes to a gearboxworks repo."),
@@ -64,6 +65,7 @@ var commitCmd = &cobra.Command{
 		Cmd.State = GitCommit(nil, strings.Join(args, " "))
 	},
 }
+
 var pullCmd = &cobra.Command{
 	Use:   CmdPull,
 	Short: ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Pull a gearboxworks repo."),
@@ -77,6 +79,7 @@ var pullCmd = &cobra.Command{
 		Cmd.State = GitPull(nil)
 	},
 }
+
 var cloneCmd = &cobra.Command{
 	Use:   CmdClone,
 	Short: ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Clone a gearboxworks repo."),
@@ -106,6 +109,7 @@ var buildCmd = &cobra.Command{
 		Cmd.State = Build(args...)
 	},
 }
+
 var releaseCmd = &cobra.Command{
 	Use:   CmdRelease,
 	Short: ux.SprintfMagenta("Workflow") + ux.SprintfBlue(" - Release a gearboxworks repo."),
@@ -120,6 +124,7 @@ var releaseCmd = &cobra.Command{
 		Cmd.State = Release(args...)
 	},
 }
+
 var ghrCmd = &cobra.Command{
 	Use:   CmdGhr,
 	Short: ux.SprintfMagenta("Workflow") + ux.SprintfBlue(" - Run github-release package."),
@@ -143,6 +148,7 @@ var golangCmd = &cobra.Command{
 		Cmd.State = Golang(args...)
 	},
 }
+
 var getCmd = &cobra.Command{
 	Use:   CmdGet,
 	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get values from GoLang src code."),
@@ -156,6 +162,7 @@ var getCmd = &cobra.Command{
 		Cmd.State = Get(args...)
 	},
 }
+
 var pkgreflectCmd = &cobra.Command{
 	Use:   CmdPkgReflect,
 	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Run pkgreflect on a GoLang directory."),
@@ -169,4 +176,3 @@ var pkgreflectCmd = &cobra.Command{
 		Cmd.State = PkgReflect(args...)
 	},
 }
-

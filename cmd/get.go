@@ -124,8 +124,6 @@ func getValue(lookfor string, path ...string) (string, *ux.State) {
 			version = strings.TrimSuffix(version, "\"")
 			break
 		}
-
-		//
 	}
 
 	return version, state
@@ -133,21 +131,33 @@ func getValue(lookfor string, path ...string) (string, *ux.State) {
 
 
 func getBinaryVersion(path ...string) (string, *ux.State) {
+	if len(path) == 0 {
+		path = DefaultVersionFile
+	}
 	return getValue(BinaryVersion, path...)
 }
 
 
 func getBinaryName(path ...string) (string, *ux.State) {
+	if len(path) == 0 {
+		path = DefaultVersionFile
+	}
 	return getValue(BinaryName, path...)
 }
 
 
 func getBinaryRepo(path ...string) (string, *ux.State) {
+	if len(path) == 0 {
+		path = DefaultVersionFile
+	}
 	return getValue(BinaryRepo, path...)
 }
 
 
 func getSourceRepo(path ...string) (string, *ux.State) {
+	if len(path) == 0 {
+		path = DefaultVersionFile
+	}
 	return getValue(SourceRepo, path...)
 }
 

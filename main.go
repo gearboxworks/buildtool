@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+
 func init() {
 	_ = ux.Open(strings.ToUpper(defaults.BinaryName) + ": ")
 }
@@ -19,9 +20,8 @@ func main() {
 	os.Exit(state.ExitCode)
 }
 
-/*
 
-@DONE - BUG - pkgreflect args not being properly set.
+/*
 
 @TODO - Add "upgrade to" command to enable semver upgrades.
 @TODO - 	In particular, handle the defaults.version.go file better.
@@ -35,8 +35,20 @@ func main() {
 @TODO - Add git ignore tag to the 'buildtool' binary.
 @TODO -		git update-index --assume-unchanged buildtool
 
+*/
 
+
+/*
+
+@DONE - BUG - pkgreflect args not being properly set.
+
+*/
+
+
+/*
 ************************************************************************
+Notes:
+
 Makefile:
         @echo "Pushing to: $(shell git branch)"
         @git config core.hooksPath .git-hooks
