@@ -21,6 +21,7 @@ const (
 	CmdGhr	 			= "ghr"
 	CmdPkgReflect		= "pkgreflect"
 	CmdGolang           = "go"
+	CmdSync				= "sync"
 )
 
 
@@ -35,6 +36,7 @@ func init() {
 	rootCmd.AddCommand(buildCmd)
 	rootCmd.AddCommand(releaseCmd)
 	rootCmd.AddCommand(pkgreflectCmd)
+	rootCmd.AddCommand(syncCmd)
 }
 
 
@@ -93,6 +95,29 @@ var cloneCmd = &cobra.Command{
 		repo := GitClone(args[0], Cmd.WorkingPath.GetPath())
 		Cmd.State = repo.State
 	},
+}
+
+var syncCmd = &cobra.Command{
+	Use:   CmdSync,
+	Short: ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Sync source and binary releases."),
+	Long:  ux.SprintfMagenta("GitHub") + ux.SprintfBlue(" - Sync source and binary releases.") + `
+Arguments:
+	version	- Release to sync.
+	path	- Path to assets cache.
+	srcrepo	- Source repo.
+	binrepo	- Binary repo.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = ProcessArgs(Cmd, cmd, args)
+		if Cmd.State.IsNotOk() {
+			return
+		}
+		a := make([]string, 4)
+		for i  := range args {
+			a[i] = args[i]
+		}
+		Cmd.State = ReleaseSync(a[0], a[1], a[2], a[3])
+	},
+	Args:	cobra.RangeArgs(0, 4),
 }
 
 

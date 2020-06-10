@@ -1,19 +1,18 @@
 package cmd
 
 import (
-	"fmt"
 	"github.com/newclarity/scribeHelpers/toolGhr"
 	"github.com/newclarity/scribeHelpers/toolGoReleaser"
 	"github.com/newclarity/scribeHelpers/ux"
 	"os"
-	"strings"
 )
 
 
 func Build(path ...string) *ux.State {
 	state := Cmd.State
 
-	state = ReleaseGhr(path...)
+	state = ReleaseSync("", "mickmake/test", "v1.1.0", "")
+
 	os.Exit(1)
 
 	for range onlyOnce {
@@ -65,7 +64,7 @@ func Release(path ...string) *ux.State {
 		}
 
 		// Run GHR - copy release to binary repo.
-		state = ReleaseGhr(path...)
+		state = ReleaseSync("", "", "", "")
 		if state.IsNotOk() {
 			break
 		}
@@ -140,70 +139,114 @@ func ReleaseGoReleaser(path ...string) *ux.State {
 }
 
 
-func ReleaseGhr(path ...string) *ux.State {
+func ReleaseSync(version string, path string, srcrepo string, binrepo string) *ux.State {
 	state := Cmd.State
 
 	for range onlyOnce {
-		if len(path) == 0 {
-			path = []string{Cmd.WorkingPath.GetPath()}
+		if srcrepo == "" {
+			srcrepo, state = getSourceRepo()
+			if state.IsNotOk() {
+				break
+			}
 		}
 
-		var version string
-		version, state = getBinaryVersion()
-		if state.IsNotOk() {
-			break
+		if binrepo == "" {
+			binrepo, state = getBinaryRepo()
+			if state.IsNotOk() {
+				break
+			}
 		}
 
-		var binrepo string
-		binrepo, state = getBinaryRepo()
-		if state.IsNotOk() {
-			break
-		}
-		binrepo = "mickmake/test"
-
-		var srcrepo string
-		srcrepo, state = getSourceRepo()
-		if state.IsNotOk() {
-			break
+		if version == "" {
+			version, state = getBinaryVersion()
+			if state.IsNotOk() {
+				break
+			}
 		}
 
+		if path == "" {
+			//path = Cmd.WorkingPath.GetPath() + "/dist"
+			path = Cmd.WorkingPath.GetPath() + "/dist"
+		}
+
+
+		ux.PrintflnBlue("Syncing Git repos...")
 		if binrepo == srcrepo {
+			ux.PrintflnBlue("Source and Binary repos identical, no action taken.")
 			// No need to push to binary repo.
+			// GoReleaser will handle this.
+			break
+		}
+		ux.PrintflnBlue("Syncing Git repos...")
+		ux.PrintflnBlue("Source repo:	 %s", srcrepo)
+		ux.PrintflnBlue("Binary repo:	 %s", binrepo)
+		ux.PrintflnBlue("Release version: %s", version)
+		ux.PrintflnBlue("Asset directory: %s", path)
+
+
+		// Setup source repo.
+		Src := toolGhr.New(nil)
+		if Src.State.IsNotOk() {
+			state = Src.State
+			break
+		}
+		state = Src.SetAuth(toolGhr.TypeAuth{ Token: "", AuthUser: "" })
+		if state.IsNotOk() {
+			break
+		}
+		state = Src.OpenUrl(srcrepo)
+		if state.IsNotOk() {
+			break
+		}
+		state = Src.SetTag(version)
+		if state.IsNotOk() {
 			break
 		}
 
-		// Run GHR - copy release to binary repo.
-		ghr := toolGhr.New(Cmd.Runtime)
-		if ghr.State.IsNotOk() {
-			state = ghr.State
+
+		// Setup destination repo.
+		Dest := toolGhr.New(nil)
+		if Src.State.IsNotOk() {
+			state = Src.State
 			break
 		}
-		state = ghr.Open("mickmake", "test")
-
-		br := strings.Split(binrepo, "/")
-		release := toolGhr.TypeRepo {
-			Organization: br[0],
-			Name:         br[1],
-			TagName:      version,
-			Description:  fmt.Sprintf("Release '%s' copied from src repo '%s'", version, srcrepo),
-			Draft:        false,
-			Prerelease:   false,
-			Target:       "",
-			Replace:      true,
-			Files:        []string{"testing", "pkgreflect.go", "init.go"},
-			Auth:         &toolGhr.TypeAuth{ Token: "", AuthUser: "" },
+		state = Dest.IsNil()
+		if state.IsNotOk() {
+			break
+		}
+		state = Dest.OpenUrl(binrepo)
+		if state.IsNotOk() {
+			break
+		}
+		state = Dest.SetOverwrite(true)
+		if state.IsNotOk() {
+			break
 		}
 
-		//state = ghr.OpenUrl("mickmake/test")
+
+		// Now sync the release in the destination repo.
+		state = Dest.CopyFrom(Src.Repo, path)
+
+
+		//// Run GHR - copy release to binary repo.
+		//ghr := toolGhr.New(Cmd.Runtime)
 		//if ghr.State.IsNotOk() {
+		//	state = ghr.State
 		//	break
 		//}
-
-		state = ghr.CreateRelease(release)
-		if ghr.State.IsNotOk() {
-			break
-		}
-
+		//
+		//br := strings.Split(binrepo, "/")
+		//release := toolGhr.TypeRepo {
+		//	Organization: br[0],
+		//	Name:         br[1],
+		//	TagName:      version,
+		//	Description:  fmt.Sprintf("Release '%s' copied from src repo '%s'", version, srcrepo),
+		//	Draft:        false,
+		//	Prerelease:   false,
+		//	Target:       "",
+		//	Overwrite:    true,
+		//	Files:        []string{},
+		//}
 	}
 
 	return state

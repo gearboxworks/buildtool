@@ -134,7 +134,11 @@ func getBinaryVersion(path ...string) (string, *ux.State) {
 	if len(path) == 0 {
 		path = DefaultVersionFile
 	}
-	return getValue(BinaryVersion, path...)
+	ret, state := getValue(BinaryVersion, path...)
+	if !strings.HasPrefix(ret, "v") {
+		ret = "v" + ret
+	}
+	return ret, state
 }
 
 
