@@ -65,6 +65,10 @@ var commitCmd = &cobra.Command{
 		}
 
 		Cmd.State = GitCommit(nil, strings.Join(args, " "))
+		//if Cmd.State.IsNotOk() {
+		//	return
+		//}
+		Cmd.State = GitPush(nil)
 	},
 }
 

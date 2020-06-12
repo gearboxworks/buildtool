@@ -24,6 +24,8 @@ func main() {
 /*
 @TODO - When 'release' do some sanity checking on existing releases and offer a "do you want to remove?" option.
 
+@TODO - Add a 'sync all releases' option to src -> binary repo release syncing.
+
 @TODO - Add "upgrade to" command to enable semver upgrades.
 @TODO - 	In particular, handle the defaults.version.go file better.
 
