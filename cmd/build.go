@@ -169,7 +169,6 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 			path = Cmd.WorkingPath.GetPath() + "/dist"
 		}
 
-
 		ux.PrintflnBlue("Syncing Git repos...")
 		if binrepo == srcrepo {
 			ux.PrintflnBlue("Source and Binary repos identical, no action taken.")
@@ -183,70 +182,8 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 		ux.PrintflnBlue("Release version: %s", version)
 		ux.PrintflnBlue("Asset directory: %s", path)
 
-
-		// Setup source repo.
-		Src := toolGhr.New(nil)
-		if Src.State.IsNotOk() {
-			state = Src.State
-			break
-		}
-		state = Src.SetAuth(toolGhr.TypeAuth{ Token: "", AuthUser: "" })
-		if state.IsNotOk() {
-			break
-		}
-		state = Src.OpenUrl(srcrepo)
-		if state.IsNotOk() {
-			break
-		}
-		state = Src.SetTag(version)
-		if state.IsNotOk() {
-			break
-		}
-
-
-		// Setup destination repo.
-		Dest := toolGhr.New(nil)
-		if Src.State.IsNotOk() {
-			state = Src.State
-			break
-		}
-		state = Dest.IsNil()
-		if state.IsNotOk() {
-			break
-		}
-		state = Dest.OpenUrl(binrepo)
-		if state.IsNotOk() {
-			break
-		}
-		state = Dest.SetOverwrite(true)
-		if state.IsNotOk() {
-			break
-		}
-
-
 		// Now sync the release in the destination repo.
-		state = Dest.CopyFrom(Src.Repo, path)
-
-
-		//// Run GHR - copy release to binary repo.
-		//ghr := toolGhr.New(Cmd.Runtime)
-		//if ghr.State.IsNotOk() {
-		//	state = ghr.State
-		//	break
-		//}
-		//
-		//br := strings.Split(binrepo, "/")
-		//release := toolGhr.TypeRepo {
-		//	Organization: br[0],
-		//	Name:         br[1],
-		//	TagName:      version,
-		//	Description:  fmt.Sprintf("Release '%s' copied from src repo '%s'", version, srcrepo),
-		//	Draft:        false,
-		//	Prerelease:   false,
-		//	Target:       "",
-		//	Overwrite:    true,
-		//	Files:        []string{},
-		//}
+		state = toolGhr.CopyReleases(srcrepo, version, binrepo, path)
 	}
 
 	return state

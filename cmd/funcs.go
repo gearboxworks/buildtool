@@ -24,14 +24,23 @@ func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []
 			break
 		}
 
-		if len(args) >= 1 {
-			ext := filepath.Ext(args[0])
-			if ext == ".json" {
-				toolArgs.Json.Filename = args[0]
+		for range onlyTwice {
+			if len(args) >= 1 {
+				ext := filepath.Ext(args[0])
+				if ext == ".json" {
+					toolArgs.Json.Filename = args[0]
+					args = args[1:]
+				} else if ext == ".tmpl" {
+					toolArgs.Template.Filename = args[0]
+					args = args[1:]
+				} else {
+					break
+				}
 			}
 		}
+		_ = Cmd.Runtime.SetArgs(args...)
 
-		toolArgs.Template.Filename = loadTools.SelectIgnore
+		//toolArgs.Template.Filename = loadTools.SelectIgnore
 
 		state = toolArgs.ValidateArgs()
 		if state.IsNotOk() {

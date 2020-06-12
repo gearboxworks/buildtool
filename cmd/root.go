@@ -10,9 +10,9 @@ import (
 )
 
 const onlyOnce = "1"
+var onlyTwice = []string{"", ""}
 
 
-//var Cmd2 TypeCmd
 var Cmd *loadTools.TypeScribeArgs
 var ConfigFile string
 const 	flagConfigFile  	= "config"
@@ -126,7 +126,6 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 			HelpAll()
 			break
 		}
-
 
 		// Show help if no commands specified.
 		if len(args) == 0 {
