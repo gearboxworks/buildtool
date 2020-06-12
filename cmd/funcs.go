@@ -40,7 +40,7 @@ func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []
 		}
 		_ = Cmd.Runtime.SetArgs(args...)
 
-		//toolArgs.Template.Filename = loadTools.SelectIgnore
+		toolArgs.Template.Filename = loadTools.SelectIgnore
 
 		state = toolArgs.ValidateArgs()
 		if state.IsNotOk() {

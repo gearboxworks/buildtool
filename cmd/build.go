@@ -4,16 +4,14 @@ import (
 	"github.com/newclarity/scribeHelpers/toolGhr"
 	"github.com/newclarity/scribeHelpers/toolGoReleaser"
 	"github.com/newclarity/scribeHelpers/ux"
-	"os"
 )
 
 
 func Build(path ...string) *ux.State {
 	state := Cmd.State
 
-	state = ReleaseSync("", "mickmake/test", "v1.1.0", "")
-
-	os.Exit(1)
+	//state = ReleaseSync("", "mickmake/test", "v1.1.0", "")
+	//os.Exit(1)
 
 	for range onlyOnce {
 		if len(path) == 0 {
