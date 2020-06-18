@@ -3,7 +3,6 @@ package cmd
 
 import (
 	"github.com/newclarity/scribeHelpers/toolGhr"
-	"github.com/newclarity/scribeHelpers/toolGo"
 	"github.com/newclarity/scribeHelpers/toolGoReleaser"
 	"github.com/newclarity/scribeHelpers/ux"
 )
@@ -194,36 +193,4 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 	}
 
 	return state
-}
-
-
-func argSourceRepo(srcrepo string) string {
-	state := Cmd.State
-	var ret string
-
-	for range onlyOnce {
-		foundRepo := GoMeta.GetSourceRepo()
-		if srcrepo == "" {
-			ret = foundRepo.GetUrl()
-			break
-		}
-
-		var argRepo toolGo.Repo
-		if err := argRepo.Set(srcrepo); err != nil {
-			state.SetError("%s: %v", toolGo.SourceRepo, err)
-			break
-		}
-
-		if foundRepo.IsNotSame(&argRepo) {
-			ux.PrintflnWarning("Requested %s (%s) differs to found %s (%s)",
-				toolGo.SourceRepo, argRepo.GetUrl(),
-				toolGo.SourceRepo, foundRepo.GetUrl(),
-			)
-			break
-		}
-		ret = foundRepo.String()
-	}
-
-	Cmd.State = state
-	return ret
 }
