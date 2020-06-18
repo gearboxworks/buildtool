@@ -1,3 +1,4 @@
+// Git and GitHub related build tools.
 package cmd
 
 import (

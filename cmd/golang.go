@@ -1,9 +1,15 @@
+// GoLang related build tools.
 package cmd
 
 import (
 	"github.com/newclarity/scribeHelpers/loadTools"
 	"github.com/newclarity/scribeHelpers/toolExec"
+	"github.com/newclarity/scribeHelpers/toolGo"
+	"github.com/newclarity/scribeHelpers/toolPath"
 	"github.com/newclarity/scribeHelpers/ux"
+	"github.com/shurcooL/vfsgen"
+	"net/http"
+	"path/filepath"
 	"strings"
 )
 
@@ -121,6 +127,77 @@ func PkgReflect(paths ...string) *ux.State {
 		if state.IsNotOk() {
 			break
 		}
+	}
+
+	return state
+}
+
+
+func VfsGen(assetDir string, goDir string) *ux.State {
+	state := Cmd.State
+
+	for range onlyOnce {
+		if len(assetDir) == 0 {
+			break
+		}
+		ux.PrintflnBlue("Running VFSGEN...")
+
+
+		// Fetch the assets directory.
+		dir := toolPath.New(nil)
+		if dir.State.IsNotOk() {
+			state = dir.State
+			break
+		}
+
+		dir.SetPath(assetDir)
+		state = dir.StatPath()
+		if state.IsNotOk() {
+			break
+		}
+		ux.PrintflnBlue("VFSGEN: Asset directory is '%s'.", dir.GetPath())
+
+
+		// Fetch the GoLang destination directory.
+		if goDir == "" {
+			//goDir = dir.GetParentDirAbs()
+			goDir = "."
+		}
+
+		goFiles := toolGo.New(Cmd.Runtime)
+		if goFiles.State.IsError() {
+			state = goFiles.State
+			break
+		}
+
+		packageName := goFiles.GetPackageName(goDir)
+		if packageName == "" {
+			packageName = filepath.Base(goDir)
+			//state.SetError("No Go files in destination directory.")
+			//break
+		}
+		ux.PrintflnBlue("VFSGEN: GoLang directory is '%s'.", goFiles.GetPath())
+
+
+		// Run vfsgen
+		ux.PrintflnBlue("VFSGEN: Generating code into file '%s'.", filepath.Join(goFiles.GetPath(), "vfsdata.go"))
+		fs := http.Dir(dir.GetDirname())
+		err := vfsgen.Generate(fs, vfsgen.Options{
+			Filename:        filepath.Join(goFiles.GetPath(), "vfsdata.go"),
+			//Filename:        "vfsdata.go",
+			PackageName:     packageName,
+			BuildTags:       "",
+			VariableName:    "",
+			VariableComment: "",
+		})
+
+		if err != nil {
+			state.SetError(err)
+			ux.PrintflnError("%s", err)
+			break
+		}
+
+		state.SetOk()
 	}
 
 	return state

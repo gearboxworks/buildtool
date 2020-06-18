@@ -1,5 +1,8 @@
 package main
 
+//go:generate buildtool vfsgen assets/files assets
+//Hey this is cool - use itself to generate itself.
+
 import (
 	"github.com/gearboxworks/buildtool/cmd"
 	"github.com/gearboxworks/buildtool/defaults"

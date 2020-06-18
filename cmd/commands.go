@@ -1,10 +1,13 @@
+//
 package cmd
 
 import (
+	"github.com/newclarity/scribeHelpers/toolGo"
 	"github.com/newclarity/scribeHelpers/ux"
 	"github.com/spf13/cobra"
 	"strings"
 )
+
 
 //noinspection ALL
 const (
@@ -17,11 +20,21 @@ const (
 	CmdClone 			= "clone"
 	CmdVersion 			= "version"
 	CmdRelease 			= "release"
-	CmdGet	 			= "get"
 	CmdGhr	 			= "ghr"
 	CmdPkgReflect		= "pkgreflect"
 	CmdGolang           = "go"
 	CmdSync				= "sync"
+	CmdVfsGen			= "vfsgen"
+
+	CmdSet	 			= "set"
+
+	CmdGet	 			= "get"
+	CmdGetAll 			= "all"
+	CmdGetName 			= "name"
+	CmdGetVersion		= "version"
+	CmdGetSourceRepo	= "src"
+	CmdGetBinaryRepo	= "bin"
+
 )
 
 
@@ -32,11 +45,24 @@ func init() {
 	rootCmd.AddCommand(pullCmd)
 	rootCmd.AddCommand(cloneCmd)
 	rootCmd.AddCommand(golangCmd)
-	rootCmd.AddCommand(getCmd)
 	rootCmd.AddCommand(buildCmd)
 	rootCmd.AddCommand(releaseCmd)
 	rootCmd.AddCommand(pkgreflectCmd)
 	rootCmd.AddCommand(syncCmd)
+	rootCmd.AddCommand(vfsGenCmd)
+
+	rootCmd.AddCommand(setCmd)
+	setCmd.AddCommand(setNameCmd)
+	setCmd.AddCommand(setVersionCmd)
+	setCmd.AddCommand(setSourceRepoCmd)
+	setCmd.AddCommand(setBinaryRepoCmd)
+
+	rootCmd.AddCommand(getCmd)
+	getCmd.AddCommand(getAllCmd)
+	getCmd.AddCommand(getNameCmd)
+	getCmd.AddCommand(getVersionCmd)
+	getCmd.AddCommand(getSourceRepoCmd)
+	getCmd.AddCommand(getBinaryRepoCmd)
 }
 
 
@@ -178,19 +204,122 @@ var golangCmd = &cobra.Command{
 	},
 }
 
+
 var getCmd = &cobra.Command{
 	Use:   CmdGet,
-	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get values from GoLang src code."),
-	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get values from GoLang src code."),
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get values from src code."),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get values from src code."),
+	Args: cobra.RangeArgs(0,1),
 	Run: func(cmd *cobra.Command, args []string) {
-		Cmd.State = ProcessArgs(Cmd, cmd, args)
-		if Cmd.State.IsNotOk() {
-			return
+		err := cmd.Help()
+		if err != nil {
+			Cmd.State.SetError(err)
 		}
-
-		Cmd.State = Get(args...)
 	},
 }
+var getAllCmd = &cobra.Command{
+	Use:   CmdGetAll,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get all values from src code."),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get all values from src code."),
+	Run: func(cmd *cobra.Command, args []string) {
+		PrintMetaValue(toolGo.All, args...)
+	},
+}
+var getNameCmd = &cobra.Command{
+	Use:   CmdGetName,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryName),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryName),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetName) + ux.SprintfBlue(" - Update the binary name within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		PrintMetaValue(toolGo.BinaryName, args...)
+	},
+}
+var getVersionCmd = &cobra.Command{
+	Use:   CmdGetVersion,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryVersion),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryVersion),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetVersion) + ux.SprintfBlue(" - Update the binary version within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		PrintMetaValue(toolGo.BinaryVersion, args...)
+	},
+}
+var getBinaryRepoCmd = &cobra.Command{
+	Use:   CmdGetBinaryRepo,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryRepo),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.BinaryRepo),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetBinaryRepo) + ux.SprintfBlue(" - Update the binary repo within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		PrintMetaValue(toolGo.BinaryRepo, args...)
+	},
+}
+var getSourceRepoCmd = &cobra.Command{
+	Use:   CmdGetSourceRepo,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.SourceRepo),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Get %s within src code.", toolGo.SourceRepo),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetSourceRepo) + ux.SprintfBlue(" - Update the source repo within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		PrintMetaValue(toolGo.SourceRepo, args...)
+	},
+}
+
+
+var setCmd = &cobra.Command{
+	Use:   CmdSet,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Sync source and binary releases."),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Sync source and binary releases."),
+	Args: cobra.RangeArgs(0,1),
+	Run: func(cmd *cobra.Command, args []string) {
+		err := cmd.Help()
+		if err != nil {
+			Cmd.State.SetError(err)
+		}
+	},
+}
+var setNameCmd = &cobra.Command{
+	Use:   CmdGetName,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryName),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryName),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetName) + ux.SprintfBlue(" - Update the binary name within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = UpdateMeta(toolGo.BinaryName, args[0])
+	},
+}
+var setVersionCmd = &cobra.Command{
+	Use:   CmdGetVersion,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryVersion),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryVersion),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetVersion) + ux.SprintfBlue(" - Update the binary version within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = UpdateMeta(toolGo.BinaryVersion, args[0])
+	},
+}
+var setBinaryRepoCmd = &cobra.Command{
+	Use:   CmdGetBinaryRepo,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryRepo),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.BinaryRepo),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetBinaryRepo) + ux.SprintfBlue(" - Update the binary repo within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = UpdateMeta(toolGo.BinaryRepo, args[0])
+	},
+}
+var setSourceRepoCmd = &cobra.Command{
+	Use:   CmdGetSourceRepo,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.SourceRepo),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Set %s within src code.", toolGo.SourceRepo),
+	Example: ux.SprintfMagenta("%s %s", CmdSet, CmdGetSourceRepo) + ux.SprintfBlue(" - Update the source repo within src.\n"),
+	Args:	cobra.ExactArgs( 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = UpdateMeta(toolGo.SourceRepo, args[0])
+	},
+}
+
 
 var pkgreflectCmd = &cobra.Command{
 	Use:   CmdPkgReflect,
@@ -203,5 +332,27 @@ var pkgreflectCmd = &cobra.Command{
 		}
 
 		Cmd.State = PkgReflect(args...)
+	},
+}
+
+
+var vfsGenCmd = &cobra.Command{
+	Use:   CmdVfsGen,
+	Short: ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Run VfsGen on a GoLang directory."),
+	Long:  ux.SprintfMagenta("GoLang") + ux.SprintfBlue(" - Run VfsGen on a GoLang directory."),
+	Args: cobra.RangeArgs(1,2),
+	Run: func(cmd *cobra.Command, args []string) {
+		Cmd.State = ProcessArgs(Cmd, cmd, args)
+		if Cmd.State.IsNotOk() {
+			return
+		}
+
+		switch len(args) {
+			case 0:
+			case 1:
+				Cmd.State = VfsGen(args[0], "")
+			case 2:
+				Cmd.State = VfsGen(args[0], args[1])
+		}
 	},
 }

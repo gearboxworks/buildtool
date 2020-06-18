@@ -1,12 +1,15 @@
+//
 package cmd
 
 import (
 	"fmt"
 	"github.com/gearboxworks/buildtool/defaults"
 	"github.com/newclarity/scribeHelpers/loadTools"
+	"github.com/newclarity/scribeHelpers/toolGo"
 	"github.com/newclarity/scribeHelpers/ux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"path/filepath"
 )
 
 const onlyOnce = "1"
@@ -14,6 +17,8 @@ var onlyTwice = []string{"", ""}
 
 
 var Cmd *loadTools.TypeScribeArgs
+var GoMetaFile *toolGo.GoFile
+var GoMeta *toolGo.GoMeta
 var ConfigFile string
 const 	flagConfigFile  	= "config"
 func SetCmd() {
@@ -21,11 +26,24 @@ func SetCmd() {
 		Cmd = loadTools.New(defaults.BinaryName, defaults.BinaryVersion, false)
 		Cmd.Runtime.SetRepos(defaults.SourceRepo, defaults.BinaryRepo)
 	}
+	if GoMeta == nil {
+		GoMetaFile = FindMetaFile()
+		GoMeta = GoMetaFile.GetMeta()
+		if GoMeta.IsNotValid() {
+			Cmd.State.SetError("Current source files do not have any build meta data.")
+		}
+		//version, err := toolGo.GetMeta(path...).Get(toolGo.BinaryVersion)
+		//if err != nil {
+		//	state.SetError(err)
+		//	break
+		//}
+	}
 }
 
 
 func init() {
 	SetCmd()
+	defaults.New(rootCmd, Cmd)
 
 	cobra.OnInitialize(initConfig)
 
@@ -94,7 +112,7 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 		// Show version.
 		ok, _ = fl.GetBool(loadTools.FlagVersion)
 		if ok {
-			VersionShow()
+			defaults.VersionShow()
 			Cmd.State.Clear()
 			break
 		}
@@ -152,4 +170,48 @@ func Execute() *ux.State {
 	}
 
 	return Cmd.State
+}
+
+
+func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []string) *ux.State {
+	state := Cmd.State
+
+	for range onlyOnce {
+		err := toolArgs.Runtime.SetArgs(cmd.Use)
+		if err != nil {
+			state.SetError(err)
+			break
+		}
+
+		err = toolArgs.Runtime.AddArgs(args...)
+		if err != nil {
+			state.SetError(err)
+			break
+		}
+
+		for range onlyTwice {
+			if len(args) >= 1 {
+				ext := filepath.Ext(args[0])
+				if ext == ".json" {
+					toolArgs.Json.Filename = args[0]
+					args = args[1:]
+				} else if ext == ".tmpl" {
+					toolArgs.Template.Filename = args[0]
+					args = args[1:]
+				} else {
+					break
+				}
+			}
+		}
+		_ = Cmd.Runtime.SetArgs(args...)
+
+		toolArgs.Template.Filename = loadTools.SelectIgnore
+
+		state = toolArgs.ValidateArgs()
+		if state.IsNotOk() {
+			break
+		}
+	}
+
+	return state
 }

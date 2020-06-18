@@ -32,6 +32,8 @@ replace github.com/newclarity/scribeHelpers/toolGoReleaser => ../scribeHelpers/t
 
 replace github.com/newclarity/scribeHelpers/toolSelfUpdate => ../scribeHelpers/toolSelfUpdate
 
+replace github.com/newclarity/scribeHelpers/toolGo => ../scribeHelpers/toolGo
+
 replace github.com/newclarity/scribeHelpers/toolGhr => ../scribeHelpers/toolGhr
 
 require (
@@ -41,12 +43,14 @@ require (
 	github.com/newclarity/scribeHelpers/toolExec v0.0.0-20200604000029-dbb313f0fedc
 	github.com/newclarity/scribeHelpers/toolGhr v0.0.0-00010101000000-000000000000
 	github.com/newclarity/scribeHelpers/toolGit v0.0.0-00010101000000-000000000000
+	github.com/newclarity/scribeHelpers/toolGo v0.0.0-00010101000000-000000000000
 	github.com/newclarity/scribeHelpers/toolGoReleaser v0.0.0-00010101000000-000000000000
-	github.com/newclarity/scribeHelpers/toolPath v0.0.0-20200611181056-b2e5f7fd5978
-	github.com/newclarity/scribeHelpers/toolRuntime v0.0.0-20200611181056-b2e5f7fd5978
+	github.com/newclarity/scribeHelpers/toolPath v0.0.0-20200612064705-ff77857fcb54
 	github.com/newclarity/scribeHelpers/toolSelfUpdate v0.0.0-00010101000000-000000000000
-	github.com/newclarity/scribeHelpers/ux v0.0.0-20200611181056-b2e5f7fd5978
+	github.com/newclarity/scribeHelpers/ux v0.0.0-20200612064705-ff77857fcb54
 	github.com/pelletier/go-toml v1.8.0 // indirect
+	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
+	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v1.0.0
