@@ -89,7 +89,7 @@ func ReleaseCommit() *ux.State {
 		if repo.State.IsNotOk() {
 			break
 		}
-		state = GitCommit(repo, "Commit for Release %s", version.String())
+		state = GitCommit(repo, "Commit for Release %s", version.Name())
 		if state.IsNotOk() {
 			break
 		}
@@ -97,11 +97,11 @@ func ReleaseCommit() *ux.State {
 		if state.IsNotOk() {
 			break
 		}
-		state = GitDelTag(repo, version.String())
+		state = GitDelTag(repo, version.Name())
 		if state.IsNotOk() {
 			break
 		}
-		state = GitAddTag(repo, version.String(), "Release %s", version.String())
+		state = GitAddTag(repo, version.Name(), "Release %s", version.Name())
 		if state.IsNotOk() {
 			break
 		}
@@ -146,7 +146,7 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 	for range onlyOnce {
 		if version == "" {
 			// Fetch version from GoLang files.
-			version = GoMeta.GetBinaryVersion().String()
+			version = GoMeta.GetBinaryVersion().Name()
 			if version == "" {
 				state.SetError("BinaryVersion is invalid")
 				break
@@ -160,7 +160,7 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 
 		if srcrepo == "" {
 			// Fetch version from GoLang files.
-			srcrepo = GoMeta.GetSourceRepo().String()
+			srcrepo = GoMeta.GetSourceRepo().GetUrl()
 			if srcrepo == "" {
 				state.SetError("BinaryVersion is invalid")
 				break
@@ -169,7 +169,7 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 
 		if binrepo == "" {
 			// Fetch version from GoLang files.
-			binrepo = GoMeta.GetBinaryRepo().String()
+			binrepo = GoMeta.GetBinaryRepo().GetUrl()
 			if binrepo == "" {
 				state.SetError("BinaryVersion is invalid")
 				break
