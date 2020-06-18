@@ -89,7 +89,7 @@ func ReleaseCommit() *ux.State {
 		if repo.State.IsNotOk() {
 			break
 		}
-		state = GitCommit(repo, "Commit for Release %s", version)
+		state = GitCommit(repo, "Commit for Release %s", version.String())
 		if state.IsNotOk() {
 			break
 		}
@@ -101,7 +101,7 @@ func ReleaseCommit() *ux.State {
 		if state.IsNotOk() {
 			break
 		}
-		state = GitAddTag(repo, version.String(), "Release %s", version)
+		state = GitAddTag(repo, version.String(), "Release %s", version.String())
 		if state.IsNotOk() {
 			break
 		}
