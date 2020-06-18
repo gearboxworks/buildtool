@@ -129,7 +129,7 @@ func ReleaseGoReleaser(path ...string) *ux.State {
 		}
 
 		gr.ShowProgress()
-		state = gr.Release(path...)
+		state = gr.Release(false, path...)
 		if state.IsNotOk() {
 			break
 		}
