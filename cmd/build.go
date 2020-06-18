@@ -71,13 +71,15 @@ func Release(path ...string) *ux.State {
 }
 
 
-func ReleaseCommit(path ...string) *ux.State {
+func ReleaseCommit() *ux.State {
 	state := Cmd.State
 
 	for range onlyOnce {
+		ux.PrintflnBlue("Committing changes prior to release.")
+
 		// Fetch version from GoLang files.
 		version := GoMeta.GetBinaryVersion()
-		if version.IsValid() {
+		if version.IsNotValid() {
 			state.SetError("BinaryVersion is invalid")
 			break
 		}
@@ -113,6 +115,8 @@ func ReleaseGoReleaser(path ...string) *ux.State {
 	state := Cmd.State
 
 	for range onlyOnce {
+		ux.PrintflnBlue("Running GoReleaser.")
+
 		if len(path) == 0 {
 			path = []string{Cmd.WorkingPath.GetPath()}
 		}
@@ -140,50 +144,36 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 	state := Cmd.State
 
 	for range onlyOnce {
-		//if srcrepo != "" {
-		//	var argSrcRepo toolGo.Repo
-		//	if err := argSrcRepo.Set(srcrepo); err != nil {
-		//		state.SetError("%s: %v", toolGo.SourceRepo, err)
-		//		break
-		//	}
-		//
-		//	srcRepo := GoMeta.GetSourceRepo()
-		//	if srcRepo.IsNotSame(srcrepo) {
-		//		ux.PrintflnWarning("%s (%s) differs to requested %s (%s)",
-		//			toolGo.SourceRepo,
-		//			srcRepo.GetUrl(),
-		//			toolGo.SourceRepo,
-		//			,
-		//		)
-		//	}
-		//}
-		//if srcrepo == "" {
-		//	srcrepo = GoMeta.GetSourceRepo()
-		//	if err != nil {
-		//		state.SetError(err)
-		//		break
-		//	}
-		//}
-		//
-		//if binrepo == "" {
-		//	binrepo, err = GoMeta.Get(toolGo.BinaryRepo)
-		//	if err != nil {
-		//		state.SetError(err)
-		//		break
-		//	}
-		//}
-		//
-		//if version == "" {
-		//	version, err = GoMeta.Get(toolGo.BinaryVersion)
-		//	if err != nil {
-		//		state.SetError(err)
-		//		break
-		//	}
-		//}
+		if version == "" {
+			// Fetch version from GoLang files.
+			version = GoMeta.GetBinaryVersion().String()
+			if version == "" {
+				state.SetError("BinaryVersion is invalid")
+				break
+			}
+		}
 
 		if path == "" {
 			//path = Cmd.WorkingPath.GetPath() + "/dist"
 			path = Cmd.WorkingPath.GetPath() + "/dist"
+		}
+
+		if srcrepo == "" {
+			// Fetch version from GoLang files.
+			srcrepo = GoMeta.GetSourceRepo().String()
+			if srcrepo == "" {
+				state.SetError("BinaryVersion is invalid")
+				break
+			}
+		}
+
+		if binrepo == "" {
+			// Fetch version from GoLang files.
+			binrepo = GoMeta.GetBinaryRepo().String()
+			if binrepo == "" {
+				state.SetError("BinaryVersion is invalid")
+				break
+			}
 		}
 
 		ux.PrintflnBlue("Syncing Git repos...")
