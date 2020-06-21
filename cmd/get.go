@@ -63,30 +63,3 @@ func FindMetaFile(path ...string) *toolGo.GoFile {
 	}
 	return metaFile
 }
-
-
-//func FindMeta(path ...string) *toolGo.GoMeta {
-//	var meta *toolGo.GoMeta
-//	for range onlyOnce {
-//		goFiles := toolGo.New(Cmd.Runtime)
-//		if goFiles.State.IsNotOk() {
-//			Cmd.State = goFiles.State
-//			break
-//		}
-//
-//		meta = goFiles.GetMeta(false, path...)
-//		if meta.Valid {
-//			break
-//		}
-//
-//		ux.PrintflnWarning("No build metadata found in path '%s'", toolGo.GetDefaultFile())
-//		ux.PrintflnBlue("Scanning all files for build metadata ...")
-//		meta = goFiles.GetMeta(true, ".")
-//		if meta.Valid {
-//			break
-//		}
-//
-//		ux.PrintflnError("No build metadata found in path '.'")
-//	}
-//	return meta
-//}

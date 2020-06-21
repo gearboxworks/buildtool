@@ -9,7 +9,6 @@ import (
 	"github.com/newclarity/scribeHelpers/ux"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"path/filepath"
 )
 
 const onlyOnce = "1"
@@ -22,21 +21,35 @@ var GoMeta *toolGo.GoMeta
 var ConfigFile string
 const 	flagConfigFile  	= "config"
 func SetCmd() {
-	if Cmd == nil {
-		Cmd = loadTools.New(defaults.BinaryName, defaults.BinaryVersion, false)
-		Cmd.Runtime.SetRepos(defaults.SourceRepo, defaults.BinaryRepo)
-	}
-	if GoMeta == nil {
-		GoMetaFile = FindMetaFile()
-		GoMeta = GoMetaFile.GetMeta()
-		if GoMeta.IsNotValid() {
-			Cmd.State.SetError("Current source files do not have any build meta data.")
+	for range onlyOnce {
+		if Cmd == nil {
+			Cmd = loadTools.New(defaults.BinaryName, defaults.BinaryVersion, false)
+
+			Cmd.Template.Ignore()
+			if Cmd.State.IsNotOk() {
+				break
+			}
+
+			Cmd.Runtime.SetRepos(defaults.SourceRepo, defaults.BinaryRepo)
+			if Cmd.State.IsNotOk() {
+				break
+			}
+
+			// Import additional tools.
+			//Cmd.ImportTools(&package.GetHelpers)
+			//if Cmd.State.IsNotOk() {
+			//	break
+			//}
 		}
-		//version, err := toolGo.GetMeta(path...).Get(toolGo.BinaryVersion)
-		//if err != nil {
-		//	state.SetError(err)
-		//	break
-		//}
+
+		if GoMeta == nil {
+			GoMetaFile = FindMetaFile()
+			GoMeta = GoMetaFile.GetMeta()
+			if GoMeta.IsNotValid() {
+				Cmd.State.SetError("Current source files do not have any build meta data.")
+				break
+			}
+		}
 	}
 }
 
@@ -44,14 +57,13 @@ func SetCmd() {
 func init() {
 	SetCmd()
 	defaults.New(rootCmd, Cmd)
-
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&ConfigFile, flagConfigFile, fmt.Sprintf("%s-config.json", defaults.BinaryName), ux.SprintfBlue("%s: config file.", defaults.BinaryName))
 	_ = rootCmd.PersistentFlags().MarkHidden(flagConfigFile)
 
-	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.Filename, loadTools.FlagJsonFile, "j", loadTools.DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
-	rootCmd.PersistentFlags().StringVarP(&Cmd.WorkingPath.Filename, loadTools.FlagWorkingPath, "p", loadTools.DefaultWorkingPath, ux.SprintfBlue("Set working path."))
+	rootCmd.PersistentFlags().StringVarP(&Cmd.Json.File, loadTools.FlagJsonFile, "j", loadTools.DefaultJsonFile, ux.SprintfBlue("%s config file.", defaults.BinaryName))
+	rootCmd.PersistentFlags().StringVarP(&Cmd.WorkingPath.File, loadTools.FlagWorkingPath, "p", loadTools.DefaultWorkingPath, ux.SprintfBlue("Set working path."))
 
 	rootCmd.PersistentFlags().BoolVarP(&Cmd.Chdir, loadTools.FlagChdir, "c", false, ux.SprintfBlue("Change to directory containing %s.", DefaultJsonFile))
 	rootCmd.PersistentFlags().BoolVarP(&Cmd.ForceOverwrite, loadTools.FlagForce, "f", false, ux.SprintfBlue("Force overwrite of output files."))
@@ -108,7 +120,6 @@ func gbRootFunc(cmd *cobra.Command, args []string) {
 		var ok bool
 		fl := cmd.Flags()
 
-		// ////////////////////////////////
 		// Show version.
 		ok, _ = fl.GetBool(loadTools.FlagVersion)
 		if ok {
@@ -173,45 +184,45 @@ func Execute() *ux.State {
 }
 
 
-func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []string) *ux.State {
-	state := Cmd.State
-
-	for range onlyOnce {
-		err := toolArgs.Runtime.SetArgs(cmd.Use)
-		if err != nil {
-			state.SetError(err)
-			break
-		}
-
-		err = toolArgs.Runtime.AddArgs(args...)
-		if err != nil {
-			state.SetError(err)
-			break
-		}
-
-		for range onlyTwice {
-			if len(args) >= 1 {
-				ext := filepath.Ext(args[0])
-				if ext == ".json" {
-					toolArgs.Json.Filename = args[0]
-					args = args[1:]
-				} else if ext == ".tmpl" {
-					toolArgs.Template.Filename = args[0]
-					args = args[1:]
-				} else {
-					break
-				}
-			}
-		}
-		_ = Cmd.Runtime.SetArgs(args...)
-
-		toolArgs.Template.Filename = loadTools.SelectIgnore
-
-		state = toolArgs.ValidateArgs()
-		if state.IsNotOk() {
-			break
-		}
-	}
-
-	return state
-}
+//func ProcessArgs(toolArgs *loadTools.TypeScribeArgs, cmd *cobra.Command, args []string) *ux.State {
+//	state := Cmd.State
+//
+//	for range onlyOnce {
+//		err := toolArgs.Runtime.SetArgs(cmd.Use)
+//		if err != nil {
+//			state.SetError(err)
+//			break
+//		}
+//
+//		err = toolArgs.Runtime.AddArgs(args...)
+//		if err != nil {
+//			state.SetError(err)
+//			break
+//		}
+//
+//		for range onlyTwice {
+//			if len(args) >= 1 {
+//				ext := filepath.Ext(args[0])
+//				if ext == ".json" {
+//					toolArgs.Json.File = args[0]
+//					args = args[1:]
+//				} else if ext == ".tmpl" {
+//					toolArgs.Template.File = args[0]
+//					args = args[1:]
+//				} else {
+//					break
+//				}
+//			}
+//		}
+//		_ = Cmd.Runtime.SetArgs(args...)
+//
+//		toolArgs.Template.File = loadTools.SelectIgnore
+//
+//		state = toolArgs.ValidateArgs()
+//		if state.IsNotOk() {
+//			break
+//		}
+//	}
+//
+//	return state
+//}
