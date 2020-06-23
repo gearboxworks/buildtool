@@ -8,7 +8,7 @@ import (
 
 
 func GitOpen() *toolGit.TypeGit {
-	return toolGit.GitOpen(Cmd.WorkingPath.GetPath())
+	return toolGit.GitOpen(CmdScribe.WorkingPath.GetPath())
 }
 
 
@@ -18,7 +18,7 @@ func GitClone(url string, path ...string) *toolGit.TypeGit {
 
 
 func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if repo == nil {
@@ -42,7 +42,7 @@ func GitCommit(repo *toolGit.TypeGit, comment string, args ...interface{}) *ux.S
 
 
 func GitAddTag(repo *toolGit.TypeGit, tag string, comment string, args ...interface{}) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if repo == nil {
@@ -66,7 +66,7 @@ func GitAddTag(repo *toolGit.TypeGit, tag string, comment string, args ...interf
 
 
 func GitPush(repo *toolGit.TypeGit) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if repo == nil {
@@ -89,7 +89,7 @@ func GitPush(repo *toolGit.TypeGit) *ux.State {
 
 
 func GitPull(repo *toolGit.TypeGit) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if repo == nil {
@@ -113,7 +113,7 @@ func GitPull(repo *toolGit.TypeGit) *ux.State {
 
 
 func GitDelTag(repo *toolGit.TypeGit, tag string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if repo == nil {
@@ -137,10 +137,10 @@ func GitDelTag(repo *toolGit.TypeGit, tag string) *ux.State {
 
 
 func GithubReleaser(args ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
-		//tmpl := loadTools.NewArgTemplate(Cmd.Debug)
+		//tmpl := loadTools.NewArgTemplate(CmdScribe.Debug)
 		//
 		//state = tmpl.ProcessArgs(cmd, args)
 		//if state.IsNotOk() {
@@ -159,7 +159,7 @@ func GithubReleaser(args ...string) *ux.State {
 		//ux.PrintflnBlue("Repo Owner: %s", owner)
 		//ux.PrintflnBlue("Repo Name: %s", name)
 		//
-		//ghr := helpers.NewGitHubRelease(Cmd.Debug)
+		//ghr := helpers.NewGitHubRelease(CmdScribe.Debug)
 		//if ghr.State.IsNotOk() {
 		//	break
 		//}

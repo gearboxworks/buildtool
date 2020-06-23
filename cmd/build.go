@@ -3,20 +3,21 @@ package cmd
 
 import (
 	"github.com/newclarity/scribeHelpers/toolGhr"
+	"github.com/newclarity/scribeHelpers/toolGo"
 	"github.com/newclarity/scribeHelpers/toolGoReleaser"
 	"github.com/newclarity/scribeHelpers/ux"
 )
 
 
 func Build(path ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(path) == 0 {
-			path = []string{Cmd.WorkingPath.GetPath()}
+			path = []string{CmdScribe.WorkingPath.GetPath()}
 		}
 
-		gr := toolGoReleaser.New(Cmd.Runtime)
+		gr := toolGoReleaser.New(CmdScribe.Runtime)
 		if gr.State.IsNotOk() {
 			state = gr.State
 			break
@@ -33,11 +34,11 @@ func Build(path ...string) *ux.State {
 
 
 func Release(path ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(path) == 0 {
-			path = []string{Cmd.WorkingPath.GetPath()}
+			path = []string{CmdScribe.WorkingPath.GetPath()}
 		}
 
 		// Ensure repo builds properly.
@@ -47,8 +48,14 @@ func Release(path ...string) *ux.State {
 			break
 		}
 
+		GoMeta := FindMetaFile().GetMeta()
+		if GoMeta.IsNotValid() {
+			state.SetError("Current source files do not have any build meta data.")
+			break
+		}
+
 		// Commit changes.
-		state = ReleaseCommit()
+		state = ReleaseCommit(GoMeta)
 		if state.IsNotOk() {
 			break
 		}
@@ -70,14 +77,14 @@ func Release(path ...string) *ux.State {
 }
 
 
-func ReleaseCommit() *ux.State {
-	state := Cmd.State
+func ReleaseCommit(meta *toolGo.GoMeta) *ux.State {
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		ux.PrintflnBlue("Committing changes prior to release.")
 
 		// Fetch version from GoLang files.
-		version := GoMeta.GetBinaryVersion()
+		version := meta.GetBinaryVersion()
 		if version.IsNotValid() {
 			state.SetError("BinaryVersion is invalid")
 			break
@@ -111,17 +118,17 @@ func ReleaseCommit() *ux.State {
 
 
 func ReleaseGoReleaser(path ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		ux.PrintflnBlue("Running GoReleaser.")
 
 		if len(path) == 0 {
-			path = []string{Cmd.WorkingPath.GetPath()}
+			path = []string{CmdScribe.WorkingPath.GetPath()}
 		}
 
 		// Run GoReleaser.
-		gr := toolGoReleaser.New(Cmd.Runtime)
+		gr := toolGoReleaser.New(CmdScribe.Runtime)
 		if gr.State.IsNotOk() {
 			state = gr.State
 			break
@@ -140,9 +147,15 @@ func ReleaseGoReleaser(path ...string) *ux.State {
 
 
 func ReleaseSync(version string, path string, srcrepo string, binrepo string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
+		GoMeta := FindMetaFile().GetMeta()
+		if GoMeta.IsNotValid() {
+			state.SetError("Current source files do not have any build meta data.")
+			break
+		}
+
 		if version == "" {
 			// Fetch version from GoLang files.
 			version = GoMeta.GetBinaryVersion().Name()
@@ -153,8 +166,8 @@ func ReleaseSync(version string, path string, srcrepo string, binrepo string) *u
 		}
 
 		if path == "" {
-			//path = Cmd.WorkingPath.GetPath() + "/dist"
-			path = Cmd.WorkingPath.GetPath() + "/dist"
+			//path = CmdScribe.WorkingPath.GetPath() + "/dist"
+			path = CmdScribe.WorkingPath.GetPath() + "/dist"
 		}
 
 		if srcrepo == "" {

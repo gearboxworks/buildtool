@@ -1,39 +1,71 @@
-BINARY := $(shell tools/getBinary.sh)
-VERSION := $(shell tools/getVersion.sh)
-COMMENT := $(shell tools/getComment.sh)
+################################################################################
+SHELL=/bin/bash
+ifeq (, $(shell which buildtool))
+$(warning "Installing buildtool...")
+$(warning "go get github.com/gearboxworks/buildtool")
+$(shell go get github.com/gearboxworks/buildtool)
+endif
+BUILDTOOL := $(shell which buildtool)
+ifeq (, $(BUILDTOOL))
+$(error "No buildtool found...")
+endif
+################################################################################
+
+args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 
 all:
-	@echo "Current $(BINARY) version is:	v$(VERSION)"
-	@echo "Last commit message is:		'$(COMMENT)'"
-	@#echo git tag -a v$(VERSION) -m '"$(COMMENT)"'
-	@#echo git push origin v$(VERSION)
-	@echo ""
-	@echo "build	- Build for local testing."
-	@echo "release	- Build for published release."
-	@echo "push	- Push repo to GitHub."
-	@echo "sync	- Used only by MickMake"
+	@:
+
+%:
+	@:
+
+################################################################################
+
+help:
+	@$(BUILDTOOL) $@ $(args)
 
 build:
-	@goreleaser --snapshot --skip-publish --rm-dist
+	@$(BUILDTOOL) $@ $(args)
 
-release:
-	@echo "Current $(BINARY) version is v$(VERSION)"
-	@git add .
-	@git commit -a -m '"Commit before release v$(VERSION)"'
-	-@git push
-	@git tag -a v$(VERSION) -m '"Release v$(VERSION)"'
-	@git push origin v$(VERSION)
-	@goreleaser --rm-dist
+clone:
+	@$(BUILDTOOL) $@ $(args)
 
-sync:
-	@rsync -HvaxP dist/$(BINARY)_darwin_amd64/$(BINARY) mick@macpro:~/Documents/GitHub/containers/docker-template/bin/Darwin/$(BINARY)
-	@rsync -HvaxP dist/$(BINARY)_linux_amd64/$(BINARY) mick@macpro:~/Documents/GitHub/containers/docker-template/bin/Linux/$(BINARY)
-	@rsync -HvaxP dist/$(BINARY)_windows_amd64/$(BINARY).exe mick@macpro:~/Documents/GitHub/containers/docker-template/bin/Windows/$(BINARY).exe
+commit:
+	@$(BUILDTOOL) $@ $(args)
+
+get:
+	@$(BUILDTOOL) $@ $(args)
+
+ghr:
+	@$(BUILDTOOL) $@ $(args)
+
+go:
+	@$(BUILDTOOL) $@ $(args)
+
+pkgreflect:
+	@$(BUILDTOOL) $@ $(args)
+
+pull:
+	@$(BUILDTOOL) $@ $(args)
 
 push:
-	@echo "Pushing to: $(shell git branch)"
-	@git config core.hooksPath .git-hooks
-	@git add .
-	@git commit -m '"$(COMMENT)"' .
-	@git push
+	@$(BUILDTOOL) $@ $(args)
+
+release:
+	@$(BUILDTOOL) $@ $(args)
+
+selfupdate:
+	@$(BUILDTOOL) $@ $(args)
+
+set:
+	@$(BUILDTOOL) $@ $(args)
+
+sync:
+	@$(BUILDTOOL) $@ $(args)
+
+version:
+	@$(BUILDTOOL) $@ $(args)
+
+vfsgen:
+	@$(BUILDTOOL) $@ $(args)
 

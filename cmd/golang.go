@@ -15,7 +15,7 @@ import (
 
 
 func Golang(args ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(args) == 0 {
@@ -37,7 +37,7 @@ func Golang(args ...string) *ux.State {
 
 
 func goLangHelp() *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	ux.PrintflnYellow("Need to supply one of:")
 	ux.PrintflnYellow("\tupdate - Detect go.mod files recursively and update modules.")
@@ -47,7 +47,7 @@ func goLangHelp() *ux.State {
 
 
 func goLangUpdate(path ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(path) == 0 {
@@ -56,7 +56,7 @@ func goLangUpdate(path ...string) *ux.State {
 
 		ux.PrintflnBlue("Updating go modules...")
 
-		e := toolExec.NewMultiExec(Cmd.Runtime)
+		e := toolExec.NewMultiExec(CmdScribe.Runtime)
 		if e.State.IsNotOk() {
 			state = e.State
 			break
@@ -103,7 +103,7 @@ func goLangUpdate(path ...string) *ux.State {
 
 
 func PkgReflect(paths ...string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(paths) == 0 {
@@ -134,7 +134,7 @@ func PkgReflect(paths ...string) *ux.State {
 
 
 func VfsGen(assetDir string, goDir string) *ux.State {
-	state := Cmd.State
+	state := CmdScribe.State
 
 	for range onlyOnce {
 		if len(assetDir) == 0 {
@@ -164,7 +164,7 @@ func VfsGen(assetDir string, goDir string) *ux.State {
 			goDir = "."
 		}
 
-		goFiles := toolGo.New(Cmd.Runtime)
+		goFiles := toolGo.New(CmdScribe.Runtime)
 		if goFiles.State.IsError() {
 			state = goFiles.State
 			break
